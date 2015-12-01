@@ -1,0 +1,47 @@
+.q-check {
+    min-width: 30px;
+}
+
+.q-leftpad {
+    min-width: 70px;
+}
+
+.q-points {
+    min-width: 70px;
+}
+
+.q-verse {
+    min-width: 70px;
+}
+
+.q-text {
+    
+}
+
+.chapterHeader {
+    width: 100%;
+}
+
+.chapterHeader .md-subheader-inner {
+    padding-top: 0px!important;
+    padding-bottom: 0px!important;
+    padding-left: 11px!important;
+    background-color: #eeeeee!important;
+}
+
+.md-fab.md-pbe-theme {
+    position:fixed!important;
+}
+
+.md-icon-button.md-pbe-theme {
+    background-color: rgba(255,255,255,0);
+}
+
+.pbe-actions-fixed {
+    position:fixed!important;
+    bottom: 0px;
+    right: 0px;
+    min-width: 100%;
+    background-color: #efefef;
+    z-index: 10000;
+}

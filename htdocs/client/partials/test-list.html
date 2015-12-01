@@ -1,0 +1,51 @@
+<div layout-fill >
+<md-content flex layout="column" layout-padding>
+    <md-whiteframe class="md-whiteframe-1dp">
+    <md-list layout-margin>
+      <md-list-item class="md-3-line" ng-repeat="s in tests" style="position: relative!important">
+        <div class="md-list-item-text">
+          <h3></h3><b><a href ng-click="editTest(s.TestId)">{{s.Title}}</a></b></h3>
+          <h4>{{s.SubTitle}}</h4>
+          <p>{{s.Questions.length}} Questions</p>
+        </div>
+        <div layout="row" layout-align="center center" >
+            <md-button class="md-icon-button" aria-label="Present" style="margin:0 -9px !important" ng-click="presentTest(s.TestId)">
+               <md-icon class="material-icons">present_to_all</md-icon>
+            </md-button>
+            <!--<md-button class="md-icon-button" aria-label="More" style="margin:0 -9px !important" ng-click="editTest(s.TestId)">-->
+            <!--   <md-icon class="material-icons">more_vert</md-icon>-->
+            <!--</md-button>-->
+            
+            <md-menu md-position-mode="target-right target" >
+              <md-button aria-label="Test Menu" class="md-icon-button" style="margin:0 -9px !important" ng-click="$mdOpenMenu($event)">
+               <md-icon class="material-icons">more_vert</md-icon>
+              </md-button>
+              <md-menu-content width="3" >
+                <md-menu-item ng-repeat="item in ['Edit', 'Delete']">
+                  <md-button ng-click="handleMenuClick(item, s.TestId)">
+                      <div layout="row">
+                        <p flex>{{item}}</p>
+                        <!--<md-icon md-menu-align-target md-svg-icon="call:portable-wifi-off" style="margin: auto 3px auto 0;"></md-icon>-->
+                      </div>
+                  </md-button>
+                </md-menu-item>
+              </md-menu-content>
+            </md-menu>
+
+            
+        </div>
+        <!--<md-button ng-click="">Edit</md-button>-->
+        <md-divider ng-if="!$last"></md-divider>
+        <!--<md-button ng-click="">Edit</md-button>-->
+        
+      </md-list-item>
+    </md-list>
+    </md-whiteframe>
+
+</md-content>
+
+<md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="editTest()">
+   <md-icon class="material-icons">add</md-icon>
+</md-button>
+</div>
+<div style="min-height:100px"></div>

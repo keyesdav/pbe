@@ -1,0 +1,68 @@
+
+    <md-content class="md-padding" layout-padding >
+    <!--<md-whiteframe layout="column" layout-align="start start" layout-padding class="md-whiteframe-1dp">-->
+        <form style="width: 100%" name="userForm">
+            <div flex layout="column" layout-align="start start">
+                <md-input-container style="width: 100%">
+                    <label>Test Title</label>
+                    <input ng-model="myTest.Title" /> 
+                </md-input-container>
+                <md-input-container style="width: 100%">
+                    <label>Test Subtitle</label>
+                    <input ng-model="myTest.SubTitle" /> 
+                </md-input-container>
+
+            </div>
+        </form>
+        <md-tabs md-dynamic-height md-border-bottom class="md-accent" style="width:100%">
+          <md-tab label="Custom">
+
+            <md-content layout="column" layout-align="center center">
+            <div id="chapter-progress" style="width:100%" layout-align="center center"><md-progress-circular md-mode="indeterminate"></md-progress-circular></div>
+            <section style="width:100%" ng-repeat="chapter in chapters">
+                <md-subheader ng-if="chapter.questions.length > 0" class="chapterHeader md-primary">
+                    <div layout="row" layout-align="start center">
+                        <md-checkbox class="q-check" ng-model="chapter.selectAll" ng-change="handleChangeSelectAll(chapter)" aria-label="chapter.number"></md-checkbox>
+                        <div>Chapter {{chapter.number}}</div>
+                    </div>
+                </md-subheader>
+                 <md-list ng-if="chapter.questions.length > 0">
+                      <div layout="row" layout-align="start center" layout-padding>
+                          <div class="q-leftpad"></div>
+                          <div class="q-verse"><u>Verse</u></div>  
+                          <div class="q-points"><u>Points</u></div>  
+                          <div class="q-text"><u>Question</u></div></p>
+                          <md-divider></md-divider>
+                      </div>
+                      <md-list-item ng-repeat="question in chapter.questions" layout="row">
+                        <md-checkbox class="q-check" ng-model="question.selected" aria-label="{{question.verse}}"></md-checkbox>
+                        <div class="q-verse">{{question.verse}}</div>  
+                        <div class="q-points">{{question.points}}</div>  
+                        <div class="q-text">{{question.question}}</div></p>
+                        <!--<md-icon class="md-secondary" ng-click="doSecondaryAction($event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
+                          <md-divider></md-divider>
+                      </md-list-item>
+                 </md-list>
+            </section>
+            
+            </md-content>
+          </md-tab>
+          <md-tab label="Auto">
+          </md-tab>
+        </md-tabs>
+            <!--<label>Tags</label>-->
+            <!--<md-chips-->
+            <!--    ng-model="Tags"-->
+            <!--    placeholder="Add"-->
+            <!--    readonly="false"-->
+            <!--    >-->
+                
+            <!--</md-chips>-->
+    <!--</md-whiteframe>-->
+    <div style="min-height:100px"></div>
+    
+    <div class="pbe-actions-fixed" layout="row" layout-align="end center">
+        <md-button class="md-raised" ng-click="cancel()"> Cancel </md-button>
+        <md-button class="md-raised md-primary" ng-click="save()"> Save </md-button>
+    </div>
+    </md-content>

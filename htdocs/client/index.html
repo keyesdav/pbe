@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" ng-app="PbeApp" ng-cloak="">
+  <head>
+    <title>Pathfinder Bible Experience Test Management</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--<link rel="stylesheet" href="/css/bootstrap.min.css">-->
+    <!--<link rel="stylesheet" href="/css/bootstrap-responsive.min.css">-->
+
+    <!-- Latest compiled and minified CSS -->
+
+    <!-- Angular Material CSS now available via Google CDN; version 0.11.2 used here -->
+    <link rel="stylesheet" href="/bower/angular-material/angular-material.min.css">
+    <!--<link rel="stylesheet" href="/bower/angular-material-icons/angular-material-icons.css">-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="/css/story.css">
+    <link rel="stylesheet" href="bower/angular-chart.js/dist/angular-chart.css">
+    <!--<link rel="stylesheet" href="bower/angular-ui-router-anim-in-out/css/anim-in-out.css">-->
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+    <script src="/bower/angular/angular.min.js"></script>
+    <script src="/bower/angular-animate/angular-animate.min.js"></script>
+    <script src="/bower/angular-aria/angular-aria.min.js"></script>
+
+    <script src="/bower/angular-material/angular-material.min.js"></script>
+    <script src="/bower/angular-material-icons/angular-material-icons.min.js"></script>
+    <script src="/bower/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <!--<script src="/bower/angular-ui-router-anim-in-out/anim-in-out.js"></script>-->
+    <script src="/bower/angular-resource/angular-resource.min.js"></script>
+    <script src="/bower/ngSticky/dist/sticky.min.js"></script>
+    
+    <script type="text/javascript" src="/js/app.js"></script>
+    <script type="text/javascript" src="/js/services.js"></script>
+    
+    <script type="text/javascript" src="/js/cache.js"></script>
+
+
+  </head>
+    <body layout="column" ng-controller="MainAppController">
+      <md-toolbar sticky>
+        <div class="md-toolbar-tools">
+          <h2>
+            <span>Test Management</span>
+          </h2>
+          <span flex></span>
+        </div>
+      </md-toolbar>
+    <div flex >
+      <div layout-fill ui-view></div>
+    </div>
+  </body>
+</html>

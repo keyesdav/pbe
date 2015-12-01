@@ -1,0 +1,24 @@
+{
+  "name": "pbe",
+  "version": "0.0.0",
+  "authors": [
+    "David Keyes <keyesdav@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-material": "~0.11.4",
+    "angular-material-icons": "~0.6.0",
+    "angular-route": "~1.4.7",
+    "angular-chart.js": "~0.8.5",
+    "angular-resource": "~1.4.7",
+    "angular-ui-router": "~0.2.15"
+  }
+}
