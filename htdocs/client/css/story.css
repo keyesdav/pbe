@@ -45,3 +45,9 @@
     background-color: #efefef;
     z-index: 10000;
 }
+
+
+.border-standard {
+    border-style: solid;
+    border-width: 1px;
+}

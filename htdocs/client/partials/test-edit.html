@@ -52,11 +52,13 @@
         </md-tab>
         <md-tab label="Auto">
             <div layout="column">
-                <md-checkbox ng-model="auto.enabled" aria-label="Enable auto test generate">
-                    Enable Auto-generate
-                </md-checkbox>
-                <fieldset>
-                    <legend>Test Size</legend>
+                <div layout="row" layout-align="center center">
+                    <md-button ng-click="autoGenerateQuestions($event)" style="width:50%" class="md-raised" aria-label="Generate Questions">
+                        Generate Questions
+                    </md-button>
+                </div>
+                <fieldset class="border-standard">
+                    <legend>Size</legend>
                     <md-radio-group ng-model="auto.sizing" layout="column">
                         <div layout="row">
                             <md-radio-button style="margin-right:-3px; margin-left:-3px" value="questions"></md-radio-button>
@@ -64,10 +66,10 @@
                                 <div flex="10" style="min-width: 75px; padding-right:15px" layout layout-align="start center">
                                     <span class="md-body-1">Questions</span>
                                 </div>
-                                <md-slider style="margin-top: -3px" layout-padding layout-align="center center" flex min="0" max="45" ng-model="auto.questions" aria-label="Question Count" id="questions-slider" class>
+                                <md-slider ng-disabled="auto.sizing!='questions'" style="margin-top: -3px" layout-padding layout-align="center center" flex min="0" max="45" ng-model="auto.questions" aria-label="Question Count" id="questions-slider" class>
                                 </md-slider>
                                 <div flex="10" style="min-width: 70px" layout layout-padding layout-align="center center">
-                                    <input flex type="number" ng-model="auto.questions" aria-label="Question Count" aria-controls="questions-slider">
+                                    <input ng-disabled="auto.sizing!='questions'" flex type="number" ng-model="auto.questions" aria-label="Question Count" aria-controls="questions-slider">
                                 </div>
                             </div>
                         </div>
@@ -77,15 +79,26 @@
                                 <div flex="10" style="min-width: 75px; padding-right:15px" layout layout-align="start center">
                                     <span class="md-body-1">Points</span>
                                 </div>
-                                <md-slider style="margin-top: -3px" layout-padding flex min="0" max="100" ng-model="auto.points" aria-label="Point Count" id="points-slider" class>
+                                <md-slider ng-disabled="auto.sizing!='points'" style="margin-top: -3px" layout-padding flex min="0" max="100" ng-model="auto.points" aria-label="Point Count" id="points-slider" class>
                                 </md-slider>
                                 <div flex="10" style="min-width: 70px" layout layout-padding layout-align="center center">
-                                    <input flex type="number" ng-model="auto.points" aria-label="Point Count" aria-controls="points-slider">
+                                    <input ng-disabled="auto.sizing!='points'" flex type="number" ng-model="auto.points" aria-label="Point Count" aria-controls="points-slider">
                                 </div>
                             </div>
                         </div>
                     </md-radio-group>
                 </fieldset>
+                <fieldset class="border-standard">
+                    <legend>Order</legend>
+                    <md-radio-group ng-model="auto.order" layout="row">
+                        <md-radio-button style="margin-left:-3px" value="linear">Linear</md-radio-button>
+                        <md-radio-button selected value="random">Random</md-radio-button>
+                    </md-radio-group>
+                </fieldset>
+                <fieldset class="border-standard">
+                    <legend>Content</legend>
+                </fieldset>
+
             </div>
         </md-tab>
     </md-tabs>
