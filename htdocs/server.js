@@ -11,6 +11,9 @@ var express  = require('express');
 var request  = require('request');
 var uuid     = require('uuid');
 var bodyParser = require('body-parser');
+var NodeCache = require( "node-cache" );
+
+var ttlCache = new NodeCache( { stdTTL: 28800, checkperiod: 600 } );  // cache this for eight hours
 
 var awsCredentials = require('./aws.credentials.json');
 
@@ -71,6 +74,7 @@ app.get('/api/pbe/tests/:testId', handleGetPbeTest);
 app.post('/api/pbe/tests/:testId', handlePostCreateOrUpdatePbeTest);
 app.post('/api/pbe/tests', handlePostCreateOrUpdatePbeTest);
 app.delete('/api/pbe/tests/:testId', handleDeletePbeTest);
+app.delete('/api/pbe/cache', handleDeleteCache);
 
 
 /////////////////////////
@@ -260,14 +264,25 @@ function handleGetPbeQuestions(req, rsp){
 //  var url="https://script.google.com/macros/s/AKfycbxqdxOL1U516tJ2Wj6afDPBl0XOGNfx8DZxyQjr4qsA2_TbewE/exec";
   var url="https://script.google.com/macros/s/AKfycbxqdxOL1U516tJ2Wj6afDPBl0XOGNfx8DZxyQjr4qsA2_TbewE/exec";
   
-  request({
-      followAllRedirects: true,
-      url: url
-    }, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      rsp.json(JSON.parse(response.body));
-    }
-  });
+  var questions = ttlCache.get("questions");
+  
+  if(typeof questions == 'undefined'){
+  
+    request({
+        followAllRedirects: true,
+        url: url
+      }, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        var rspJson = JSON.parse(response.body);
+        ttlCache.set("questions", rspJson);
+        
+        rsp.json(rspJson);
+      }
+    });
+  } else {
+      rsp.json(questions);
+
+  }
   // qhttp.read(url)
   //   .then( function(content){
   //     rsp.json(JSON.parse(content));
@@ -399,4 +414,9 @@ function handleDeletePbeTest(req, rsp){
       }
     });
 
+}
+
+function handleDeleteCache(req, rsp){
+  
+  ttlCache.delete('questions');
 }

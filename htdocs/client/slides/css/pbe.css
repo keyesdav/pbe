@@ -61,3 +61,20 @@
     color: rgba(255,255,255, .5);
 }
 
+.btn {
+  -webkit-border-radius: 5;
+  -moz-border-radius: 5;
+  border-radius: 5px;
+  font-family: Arial;
+  color: #ffffff !important;
+  font-size: 20px !important;
+  background: #4e98c9 !important;
+  padding: 10px 20px 10px 20px !important;
+  text-decoration: none !important;
+}
+
+.btn:hover {
+  background: #3cb0fd !important;
+  text-decoration: none;
+  cursor: pointer !important;
+}

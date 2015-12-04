@@ -4,17 +4,17 @@
         <div flex layout="column" layout-align="start start">
             <md-input-container style="width: 100%">
                 <label>Test Title</label>
-                <input ng-model="myTest.Title" />
+                <input type="string" ng-model="myTest.Title" />
             </md-input-container>
             <md-input-container style="width: 100%">
                 <label>Test Subtitle</label>
-                <input ng-model="myTest.SubTitle" />
+                <input type="string" ng-model="myTest.SubTitle" />
             </md-input-container>
 
         </div>
     </form>
-    <md-tabs md-dynamic-height md-border-bottom class="md-accent" style="width:100%">
-        <md-tab label="Custom">
+    <md-tabs md-selected="selectedTab" md-dynamic-height md-border-bottom class="md-accent" style="width:100%">
+        <md-tab label="Manual Selection">
 
             <md-content layout="column" layout-align="center center">
                 <div id="chapter-progress" style="width:100%" layout-align="center center">
@@ -50,15 +50,15 @@
 
             </md-content>
         </md-tab>
-        <md-tab label="Auto">
+        <md-tab label="Auto Selection">
             <div layout="column">
                 <div layout="row" layout-align="center center">
-                    <md-button ng-click="autoGenerateQuestions($event)" style="width:50%" class="md-raised" aria-label="Generate Questions">
+                    <md-button ng-click="autoGenerateQuestions($event)" style="width:50%;height:80px;margin-top:10px" class="md-raised" aria-label="Generate Questions">
                         Generate Questions
                     </md-button>
                 </div>
                 <fieldset class="border-standard">
-                    <legend>Size</legend>
+                    <legend>Test Size</legend>
                     <md-radio-group ng-model="auto.sizing" layout="column">
                         <div layout="row">
                             <md-radio-button style="margin-right:-3px; margin-left:-3px" value="questions"></md-radio-button>
@@ -89,15 +89,35 @@
                     </md-radio-group>
                 </fieldset>
                 <fieldset class="border-standard">
-                    <legend>Order</legend>
+                    <legend>Question Choice</legend>
                     <md-radio-group ng-model="auto.order" layout="row">
-                        <md-radio-button style="margin-left:-3px" value="linear">Linear</md-radio-button>
+                        <md-radio-button style="margin-left:-3px" value="linear">Sequential</md-radio-button>
                         <md-radio-button selected value="random">Random</md-radio-button>
                     </md-radio-group>
                 </fieldset>
                 <fieldset class="border-standard">
-                    <legend>Content</legend>
+                    <legend>Test Content</legend>
+                    <div layout="row" layout-align="start start" layout-wrap>
+                        <md-checkbox sytle="" ng-model="auto.selectAll" ng-change="handleAutoSelectAll($event)">
+                            <p>Select All</p>
+                        </md-checkbox>
+                    </div>
+                    <div layout="row" layout-align="start start" layout-wrap>
+                        <div style="min-width: 140px" ng-repeat="chapter in chapters" layout="column" layout-align="start start">
+                            <div>
+                                <md-checkbox sytle="margin: 0px" ng-model="auto.selected[chapter.number-1]">
+                                    <p style="margin-top: 16px;margin-bottom:0px">Chapter {{chapter.number}}</p>
+                                    <p style="font-size: 12px; margin-top:-8px;margin-right:0px;margin-bottom:0px;color: grey;text-align:right">{{chapter.questions.length}} questions</p>
+                                </md-checkbox>
+                            </div>
+                        </div>
+                    </div>
                 </fieldset>
+                <div layout="row" layout-align="center center">
+                    <md-button ng-click="autoGenerateQuestions($event)" style="width:50%;height:80px;margin-top:10px" class="md-raised" aria-label="Generate Questions">
+                        Generate Questions
+                    </md-button>
+                </div>
 
             </div>
         </md-tab>

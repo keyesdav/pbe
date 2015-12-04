@@ -47,12 +47,14 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides pbe">
 				<section >
-					<img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'><h1>PBE Online</h1></div>
+					<img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'><h1>PBE Manager</h1></div>
 					<div class='pbecontent'>
-						<p>Loading test from cloud and generating presentation.<br/><br/>Please wait...</p>
-						<br/><br/><br/>
+						<p id="chooseOrderMsg">How do you want to present the questions in this test?</p>
+						<a id="randomizeBtn" class="btn">Random Order</a> <a id="sequentializeBtn" class="btn">Sequential Order</a>
+						<br/>
+						<br/>
 						<p>
-							<small>Copyright 2015, <a href="http://keyeslabs.com">David S. Keyes</a></small>
+							<!--<small>Copyright 2015, <a href="http://keyeslabs.com">David S. Keyes</a></small>-->
 						</p>
 					</div>
 				</section>
@@ -67,6 +69,20 @@
 		<script type="text/javascript" src="./bower_components/reveal-add-remove.js/js/reveal-add-remove.js"></script>
 
 		<script>
+
+			$("#randomizeBtn").click(function(){
+				$("#chooseOrderMsg").text("Loading test...");
+				$("#randomizeBtn").hide();
+				$("#sequentializeBtn").hide();
+				setTimeout(getData("random"), 250);
+
+			});
+			$("#sequentializeBtn").click(function(){
+				$("#chooseOrderMsg").text("Loading test...");
+				$("#randomizeBtn").hide();
+				$("#sequentializeBtn").hide();
+				setTimeout(getData("sequential"), 250);
+			});
 
 			// Full list of configuration options available at:
 			// https://github.com/hakimel/reveal.js#configuration
@@ -90,9 +106,8 @@
 			});
 			
 			
-			setTimeout(getData, 250);
 			
-			function getData(){
+			function getData(order){
 				
 				// figure out the id of the test that we want to render
 				var id = $.url().param('id');
@@ -109,15 +124,14 @@
 					
 					// remove the title slide...
 					
-					addSlides(test);
+					addSlides(test, order);
 
-					setTimeout( function(){Reveal.next(); Reveal.remove(0)}, 500);
 					// Reveal.remove(0);
 
 				});
 			}
 			
-			function addSlides(test){
+			function addSlides(test, order){
 				
 				var testQs = test.Questions;
 				
@@ -132,12 +146,21 @@
 
 				// after all of the bible verses have been loaded from the bible API, then generate slides...
 				$.when.apply($, bibleDeferreds).then(function(){
-					for(var i=0; i<testQs.length; i++){
-						addSlidesForQuestion(i, testQs[i]);
+					
+					var qNum = 0;
+					while(testQs.length > 0){
+						qNum++;
+						var i = 0;
+						if(order == "random"){
+							i=Math.floor(Math.random() * testQs.length);
+						}
+						var q = testQs[i];
+						testQs.splice(i,1);
+						addSlidesForQuestion(qNum, q);
 					}
+					setTimeout( function(){Reveal.next(); Reveal.remove(0)}, 500);
 					
 				});
-				
 				
 				
 			}
@@ -172,7 +195,7 @@
 				time += (question.points-1)*5;
 
 				var slide1 = "<img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'>"+
-				  "<h1>Question #" + (qNum+1) + "</h1></div>" +
+				  "<h1>Question #" + (qNum) + "</h1></div>" +
 				  "<div class='pbecontent'>" +
 				  "<p class='q-intro'>" + "For "+question.points+" point"+((question.points>1) ? "s" : "")+" - According to Exodus "+question.verse+":" + "<br/></p>" +
 				  "<p class='q-text'>"+question.question+"<br/></p>" +
@@ -183,7 +206,7 @@
 				$("#pbe_q"+qNum+"_1").attr("data-transition", "convex-in fade-out");
 
 				var slide2 = "<section class='future'><img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'>"+
-				  "<h1>Question #" + (qNum+1) + "</h1></div>" +
+				  "<h1>Question #" + (qNum) + "</h1></div>" +
 				  "<div class='pbecontent'>" +
 				  "<p class='q-intro'>" + "For "+question.points+" point"+((question.points>1) ? "s" : "")+" - According to Exodus "+question.verse+":" + "<br/></p>" +
 				  "<p class='q-text-dim'>"+question.question+"<br/></p>" +
