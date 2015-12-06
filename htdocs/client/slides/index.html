@@ -246,19 +246,19 @@
 				<div class='pbecontent'>
 					<p id="chooseOrderMsg">How do you want to present the questions in this test?</p>
 					      <div id="progress" class="sk-circle">
-        <div class="sk-circle1 sk-child"></div>
-        <div class="sk-circle2 sk-child"></div>
-        <div class="sk-circle3 sk-child"></div>
-        <div class="sk-circle4 sk-child"></div>
-        <div class="sk-circle5 sk-child"></div>
-        <div class="sk-circle6 sk-child"></div>
-        <div class="sk-circle7 sk-child"></div>
-        <div class="sk-circle8 sk-child"></div>
-        <div class="sk-circle9 sk-child"></div>
-        <div class="sk-circle10 sk-child"></div>
-        <div class="sk-circle11 sk-child"></div>
-        <div class="sk-circle12 sk-child"></div>
-      </div>
+					        <div class="sk-circle1 sk-child"></div>
+					        <div class="sk-circle2 sk-child"></div>
+					        <div class="sk-circle3 sk-child"></div>
+					        <div class="sk-circle4 sk-child"></div>
+					        <div class="sk-circle5 sk-child"></div>
+					        <div class="sk-circle6 sk-child"></div>
+					        <div class="sk-circle7 sk-child"></div>
+					        <div class="sk-circle8 sk-child"></div>
+					        <div class="sk-circle9 sk-child"></div>
+					        <div class="sk-circle10 sk-child"></div>
+					        <div class="sk-circle11 sk-child"></div>
+					        <div class="sk-circle12 sk-child"></div>
+					      </div>
 					<a id="randomizeBtn" class="btn">Random Order</a> <a id="sequentializeBtn" class="btn">Sequential Order</a>
 					<br/>
 					<br/>
@@ -276,6 +276,7 @@
 	<script src="lib/js/head.min.js"></script>
 	<script src="js/reveal.js"></script>
 	<script type="text/javascript" src="./bower_components/reveal-add-remove.js/js/reveal-add-remove.js"></script>
+	<script type="text/javascript" src="./bower_components/seedrandom/seedrandom.min.js"></script>
 
 	<script>
 		$("#randomizeBtn").click(function() {
@@ -293,6 +294,9 @@
 			$("#sequentializeBtn").hide();
 			setTimeout(getData("sequential"), 250);
 		});
+		
+		// create a random number generator that creates repeatable patterns...
+		var localRng = new Math.seedrandom('pbe');
 
 		// Full list of configuration options available at:
 		// https://github.com/hakimel/reveal.js#configuration
@@ -370,7 +374,10 @@
 			addTitleSlide(test);
 
 			for (var j = 0; j < testQs.length; j++) {
-				bibleDeferreds.push(instrumentQuestionWithBibleData(testQs[j]));
+				
+				if(testQs[j].src != "SDA Bible Commentary"){
+					bibleDeferreds.push(instrumentQuestionWithBibleData(testQs[j]));
+				}
 			}
 
 
@@ -382,7 +389,7 @@
 					qNum++;
 					var i = 0;
 					if (order == "random") {
-						i = Math.floor(Math.random() * testQs.length);
+						i = Math.floor(localRng() * testQs.length);
 					}
 					var q = testQs[i];
 					testQs.splice(i, 1);
@@ -430,7 +437,7 @@
 			var slide1 = "<img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'>" +
 				"<h1>Question #" + (qNum) + "</h1></div>" +
 				"<div class='pbecontent'>" +
-				"<p class='q-intro'>" + "For " + question.points + " point" + ((question.points > 1) ? "s" : "") + " - According to Exodus " + question.verse + ":" + "<br/></p>" +
+				"<p class='q-intro'>" + "For " + question.points + " point" + ((question.points > 1) ? "s" : "") + " - According to " + question.src + " " +(typeof question.verse!='undefined'?question.verse:question.page) + ":" + "<br/></p>" +
 				"<p class='q-text'>" + question.question + "<br/></p>" +
 				"<p class='q-intro'>(" + time + " seconds)</p>" +
 				"</div>";
@@ -438,27 +445,42 @@
 
 			$("#pbe_q" + qNum + "_1").attr("data-transition", "convex-in fade-out");
 
-			var slide2 = "<section class='future'><img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'>" +
+			var slide2 = "";
+			
+				if(typeof question.bibleData != 'undefined'){
+					slide2 += "<section class='future'>";
+				}
+				
+				slide2 += "<img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'>" +
 				"<h1>Question #" + (qNum) + "</h1></div>" +
 				"<div class='pbecontent'>" +
-				"<p class='q-intro'>" + "For " + question.points + " point" + ((question.points > 1) ? "s" : "") + " - According to Exodus " + question.verse + ":" + "<br/></p>" +
+				"<p class='q-intro'>" + "For " + question.points + " point" + ((question.points > 1) ? "s" : "") + " - According to " + question.src + " " + (typeof question.verse!='undefined'?question.verse:question.page) + ":" + "<br/></p>" +
 				"<p class='q-text-dim'>" + question.question + "<br/></p>" +
 				"<p class='q-text'>Answer: " + question.answer + "</p>" +
-				"</div></section>" +
-				"<section class='future'><img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'>" +
-				"<h1>" + "NKJV Bible" + "</h1></div>" +
-				"<div class='pbecontent'>" +
-				"<p class='q-intro'>" + "Exodus " + question.verse + "</p>";
-			for (var b = 0; b < question.bibleData.verses.length; b++) {
-				slide2 += "<p class='q-text-bible'><span class='q-text-bible-verse-number'>" + question.bibleData.verses[b].num + "</span>  " + question.bibleData.verses[b].text + "</p>";
-			}
-			slide2 += "</div></section>";
+				"</div>";
+				
+				if(typeof question.bibleData != 'undefined'){
+					slide2 += "</section>";
+				}
+				
+				if(typeof question.bibleData != 'undefined'){
+					slide2 += "<section class='future'><img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'>" +
+					"<h1>" + "NKJV Bible" + "</h1></div>" +
+					"<div class='pbecontent'>" +
+					"<p class='q-intro'>" + "Exodus " + question.verse + "</p>";
+					for (var b = 0; b < question.bibleData.verses.length; b++) {
+						slide2 += "<p class='q-text-bible'><span class='q-text-bible-verse-number'>" + question.bibleData.verses[b].num + "</span>  " + question.bibleData.verses[b].text + "</p>";
+					}
+					slide2 += "</div></section>";
+				}
 			Reveal.add(slide2, null, "pbe_q" + qNum + "_2");
 
 			$("#pbe_q" + qNum + "_2").attr("data-transition", "fade-in convex-out");
-			$("#pbe_q" + qNum + "_2 section").first().attr("data-transition", "fade-in convex-out");
-			$("#pbe_q" + qNum + "_2 section").last().attr("data-transition", "convex-in convex-out");
-			// $("#pbe_q"+qNum+"_2 section").last().attr("data-transition", "none-in convex-out");
+
+			if(typeof question.bibleData != 'undefined'){
+				$("#pbe_q" + qNum + "_2 section").first().attr("data-transition", "fade-in convex-out");
+				$("#pbe_q" + qNum + "_2 section").last().attr("data-transition", "convex-in convex-out");
+			}
 
 		}
 	</script>

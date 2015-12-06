@@ -47,6 +47,33 @@
                         </md-list-item>
                     </md-list>
                 </section>
+                <section style="width:100%" ng-repeat="section in commentary">
+                    <md-subheader ng-if="section.questions.length > 0" class="chapterHeader md-primary">
+                        <div layout="row" layout-align="start center">
+                            <md-checkbox class="q-check" ng-model="section.selectAll" ng-change="handleChangeSelectAll(section)" aria-label="section.section"></md-checkbox>
+                            <div>SDA Bible Commentary - {{section.section}}</div>
+                        </div>
+                    </md-subheader>
+                    <md-list ng-if="section.questions.length > 0">
+                        <div layout="row" layout-align="start center" layout-padding>
+                            <div class="q-leftpad"></div>
+                            <div class="q-verse"><u>Location</u></div>
+                            <div class="q-points"><u>Points</u></div>
+                            <div class="q-text"><u>Question</u></div>
+                            </p>
+                            <md-divider></md-divider>
+                        </div>
+                        <md-list-item ng-repeat="question in section.questions" layout="row">
+                            <md-checkbox class="q-check" ng-model="question.selected" aria-label="{{question.page}}"></md-checkbox>
+                            <div class="q-verse">{{question.page}}</div>
+                            <div class="q-points">{{question.points}}</div>
+                            <div class="q-text">{{question.question}}</div>
+                            </p>
+                            <!--<md-icon class="md-secondary" ng-click="doSecondaryAction($event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
+                            <md-divider></md-divider>
+                        </md-list-item>
+                    </md-list>
+                </section>
 
             </md-content>
         </md-tab>

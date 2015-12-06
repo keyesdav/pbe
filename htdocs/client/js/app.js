@@ -101,10 +101,12 @@
         $scope.deleteTest(testId);
       }
 
-      else if (menu == "Foo") {
-        $state.go("foo", {
-          "fooId": 1
-        });
+      else if (menu == "Present") {
+        $scope.presentTest(testId)
+      }
+      
+      else if (menu == "Score"){
+        
       }
 
     }
@@ -174,6 +176,7 @@
       $scope.myTest.Questions = [];
 
       $scope.chapters = [];
+      $scope.commentary = [];
 
       $timeout(function() {
         var testPromise = null;
@@ -193,6 +196,21 @@
         questionsPromise.then(function(questionSet) {
 
           $scope.chapters = questionSet.chapters;
+          $scope.commentary = questionSet.commentary;
+          
+          // make a map of all of the questions so that we can quickly look up by id
+          $scope.questionIdMap = {};
+          for(var i=0; i<$scope.chapters.length; i++){
+            for(var j=0; j<$scope.chapters[i].questions.length; j++){
+              $scope.questionIdMap[$scope.chapters[i].questions[j].id]=$scope.chapters[i].questions[j];
+            }
+          }
+
+          for(var i=0; i<$scope.commentary.length; i++){
+            for(var j=0; j<$scope.commentary[i].questions.length; j++){
+              $scope.questionIdMap[$scope.commentary[i].questions[j].id]=$scope.commentary[i].questions[j];
+            }
+          }
           
           $scope.auto.selected=new Array($scope.chapters.length);
         });
@@ -202,23 +220,35 @@
           console.log("DONE LOADING TEST AND QUESTIONS...");
 
           // mark all selected questions... 
+          // for (var i = 0; i < $scope.myTest.Questions.length; i++) {
+          //   var qId = $scope.myTest.Questions[i].id;
+          //   var breakback = false;
+
+          //   for (var j = 0; j < $scope.chapters.length; j++) {
+          //     for (var k = 0; k < $scope.chapters[j].questions.length; k++) {
+          //       if ($scope.chapters[j].questions[k].id == qId) {
+          //         $scope.chapters[j].questions[k].selected = true;
+          //         breakback = true;
+          //         break;
+          //       }
+          //     }
+          //     if (breakback) {
+          //       break;
+          //     }
+          //   }
+          // }
+
           for (var i = 0; i < $scope.myTest.Questions.length; i++) {
             var qId = $scope.myTest.Questions[i].id;
-            var breakback = false;
-
-            for (var j = 0; j < $scope.chapters.length; j++) {
-              for (var k = 0; k < $scope.chapters[j].questions.length; k++) {
-                if ($scope.chapters[j].questions[k].id == qId) {
-                  $scope.chapters[j].questions[k].selected = true;
-                  breakback = true;
-                  break;
-                }
-              }
-              if (breakback) {
-                break;
-              }
+            
+            var q = $scope.questionIdMap[qId];
+            if(typeof q != 'undefined' && q != null){
+              q.selected = true;
             }
           }
+
+          console.log("DONE MARKING QUESTIONS.");
+
 
         }).finally(function() {
           // hide the indicator
@@ -247,6 +277,7 @@
           .then(function(questionSet) {
 
             $scope.chapters = questionSet.chapters;
+            $scope.commentary = questionSet.commentary;
             $scope.auto.selected=new Array($scope.chapters.length);
 
             // hide the indicator
@@ -379,6 +410,7 @@
 
       testToSave.Questions = [];
 
+      // save the bible questions
       for (var j = 0; j < $scope.chapters.length; j++) {
         for (var k = 0; k < $scope.chapters[j].questions.length; k++) {
           if ($scope.chapters[j].questions[k].selected) {
@@ -387,11 +419,14 @@
         }
       }
 
-      // var testToSave = new PbeTests();
-      // testToSave.TestId = $scope.myTest.TestId;
-      // testToSave.Title = $scope.myTest.Title;
-      // testToSave.SubTitle = $scope.myTest.SubTitle;
-      // testToSave.Questions = $scope.myTest.Questions;
+      // save the commentary questions
+      for (var j = 0; j < $scope.commentary.length; j++) {
+        for (var k = 0; k < $scope.commentary[j].questions.length; k++) {
+          if ($scope.commentary[j].questions[k].selected) {
+            testToSave.Questions.push($scope.commentary[j].questions[k]);
+          }
+        }
+      }
 
       var savePromise = PbeService.saveTest(testToSave);
       savePromise.then(function(returnData) {
