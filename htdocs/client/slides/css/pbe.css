@@ -37,20 +37,20 @@
 }
 
 .q-intro {
-    font-size: 35px!important;
+    font-size: 25px!important;
     color: rgba(255,255,255, .5);
 }
 .q-answer {
-    font-size: 50px!important;
+    font-size: 40px!important;
 }
 
 .q-text-dim {
-    font-size: 50px!important;
+    font-size: 40px!important;
     color: rgba(255,255,255, .5);
 }
 
 .q-text {
-    font-size: 50px!important;
+    font-size: 40px!important;
 }
 
 .q-text-bible {

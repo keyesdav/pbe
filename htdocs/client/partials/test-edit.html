@@ -130,7 +130,7 @@
                         </md-checkbox>
                     </div>
                     <div layout="row" layout-align="start start" layout-wrap>
-                        <div style="min-width: 140px" ng-repeat="chapter in chapters" layout="column" layout-align="start start">
+                        <div ng-if="chapter.questions.length>0" style="min-width: 140px" ng-repeat="chapter in chapters" layout="column" layout-align="start start">
                             <div>
                                 <md-checkbox sytle="margin: 0px" ng-model="auto.selected.bible[chapter.number-1]">
                                     <p style="margin-top: 16px;margin-bottom:0px">Chapter {{chapter.number}}</p>
