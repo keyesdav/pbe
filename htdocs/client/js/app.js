@@ -28,6 +28,48 @@
 
     $scope.activity = "";
 
+    $scope.sidebar = {};
+    $scope.sidebar.tests = [{
+      link: 'showTestManager',
+      title: 'Manage',
+      icon: 'dashboard'
+    }, {
+      link: '',
+      title: 'History',
+      icon: 'attach_money'
+    }, {
+      link: '',
+      title: 'Messages',
+      icon: 'message'
+    }];
+    $scope.sidebar.members = [{
+      link: 'manageUsers',
+      title: 'Manage',
+      icon: 'voicemail'
+    }, {
+      link: 'trackMemberProgress',
+      title: 'Track',
+      icon: 'dashboard'
+    }];
+
+    ///////////////////
+    // this method is called by child controllers to set the description
+    // of the activity being performed...
+    $scope.setActivity = function(act) {
+      $scope.activity = act;
+    }
+
+    $scope.callFunction = function(func, evnt) {
+      if (angular.isFunction($scope[func])) {
+        $scope[func](evnt);
+      }
+    }
+
+    $scope.toggleSidenav = function(){
+      $mdSidenav('left').toggle();
+    }
+
+
     $scope.editStory = function($event) {
       $state.go('test-edit', {
         testId: "1"
@@ -104,9 +146,9 @@
       else if (menu == "Present") {
         $scope.presentTest(testId)
       }
-      
-      else if (menu == "Score"){
-        
+
+      else if (menu == "Score") {
+
       }
 
     }
@@ -157,14 +199,14 @@
   app.controller("TestEditController", function($scope, $state, $q, $stateParams, $cacheFactory, $timeout, $mdDialog, PbeService) {
 
     var passedTestId = $stateParams.testId;
-    
+
     $scope.selectedTab = 0;
 
     $scope.auto = {};
     $scope.auto.sizing = "questions";
     $scope.auto.questions = 20;
     $scope.auto.order = "random";
-    $scope.auto.selected={};
+    $scope.auto.selected = {};
     $scope.auto.selected.bible = [];
     $scope.auto.selected.commentary = [];
 
@@ -199,23 +241,23 @@
 
           $scope.chapters = questionSet.chapters;
           $scope.commentary = questionSet.commentary;
-          
+
           // make a map of all of the questions so that we can quickly look up by id
           $scope.questionIdMap = {};
-          for(var i=0; i<$scope.chapters.length; i++){
-            for(var j=0; j<$scope.chapters[i].questions.length; j++){
-              $scope.questionIdMap[$scope.chapters[i].questions[j].id]=$scope.chapters[i].questions[j];
+          for (var i = 0; i < $scope.chapters.length; i++) {
+            for (var j = 0; j < $scope.chapters[i].questions.length; j++) {
+              $scope.questionIdMap[$scope.chapters[i].questions[j].id] = $scope.chapters[i].questions[j];
             }
           }
 
-          for(var i=0; i<$scope.commentary.length; i++){
-            for(var j=0; j<$scope.commentary[i].questions.length; j++){
-              $scope.questionIdMap[$scope.commentary[i].questions[j].id]=$scope.commentary[i].questions[j];
+          for (var i = 0; i < $scope.commentary.length; i++) {
+            for (var j = 0; j < $scope.commentary[i].questions.length; j++) {
+              $scope.questionIdMap[$scope.commentary[i].questions[j].id] = $scope.commentary[i].questions[j];
             }
           }
-          
-          $scope.auto.selected.bible=new Array($scope.chapters.length);
-          $scope.auto.selected.commentary=new Array($scope.commentary.length);
+
+          $scope.auto.selected.bible = new Array($scope.chapters.length);
+          $scope.auto.selected.commentary = new Array($scope.commentary.length);
         });
 
         var allProms = [testPromise, questionsPromise];
@@ -243,9 +285,9 @@
 
           for (var i = 0; i < $scope.myTest.Questions.length; i++) {
             var qId = $scope.myTest.Questions[i].id;
-            
+
             var q = $scope.questionIdMap[qId];
-            if(typeof q != 'undefined' && q != null){
+            if (typeof q != 'undefined' && q != null) {
               q.selected = true;
             }
           }
@@ -281,8 +323,8 @@
 
             $scope.chapters = questionSet.chapters;
             $scope.commentary = questionSet.commentary;
-            $scope.auto.selected.bible=new Array($scope.chapters.length);
-            $scope.auto.selected.commentary=new Array($scope.commentary.length);
+            $scope.auto.selected.bible = new Array($scope.chapters.length);
+            $scope.auto.selected.commentary = new Array($scope.commentary.length);
 
             // hide the indicator
             // setTimeout(function(){
@@ -310,15 +352,15 @@
         }
       }
     }
-    
-    
-    $scope.handleAutoSelectAll = function(evt){
+
+
+    $scope.handleAutoSelectAll = function(evt) {
       var checked = $scope.auto.selectAll;
-      for(var i=0; i<$scope.auto.selected.bible.length; i++){
-        $scope.auto.selected.bible[i]=checked;
+      for (var i = 0; i < $scope.auto.selected.bible.length; i++) {
+        $scope.auto.selected.bible[i] = checked;
       }
-      for(var i=0; i<$scope.auto.selected.commentary.length; i++){
-        $scope.auto.selected.commentary[i]=checked;
+      for (var i = 0; i < $scope.auto.selected.commentary.length; i++) {
+        $scope.auto.selected.commentary[i] = checked;
       }
 
     }
@@ -332,28 +374,28 @@
         .cancel('Cancel');
       $mdDialog.show(confirm).then(function() {
         //console.log("selected chapters: "+$scope.auto.selected.bible);
-        
+
         // loop through the selected chapters in the auto-select and then choose questions
         var autoSelectedChapters = [];
-        for(var i=0; i<$scope.auto.selected.bible.length; i++){
-          if($scope.auto.selected.bible[i]==true){
+        for (var i = 0; i < $scope.auto.selected.bible.length; i++) {
+          if ($scope.auto.selected.bible[i] == true) {
             autoSelectedChapters.push(i);
           }
         }
 
         var autoSelectedSections = [];
-        for(var i=0; i<$scope.auto.selected.commentary.length; i++){
-          if($scope.auto.selected.commentary[i]==true){
+        for (var i = 0; i < $scope.auto.selected.commentary.length; i++) {
+          if ($scope.auto.selected.commentary[i] == true) {
             autoSelectedSections.push(i);
           }
         }
-  
-        
+
+
         // if no chapters or commentary sections were selected, just return... nothing to do
-        if(autoSelectedChapters.length == 0 && autoSelectedSections.length == 0){
+        if (autoSelectedChapters.length == 0 && autoSelectedSections.length == 0) {
           return;
         }
-        
+
         // clear out the questions on the test so that we can fill in with newly selected questions
         $scope.myTest.Questions = [];
         // clear out the tick marks on the UI
@@ -368,30 +410,30 @@
           }
         }
 
-        
+
         var usedTable = {}; // used to track which questions have been used already
         var qCount = 0;
-        var qLimit = $scope.auto.sizing == 'questions'?$scope.auto.questions:1;
+        var qLimit = $scope.auto.sizing == 'questions' ? $scope.auto.questions : 1;
         var pCount = 0;
-        var pLimit = $scope.auto.sizing == 'points'?$scope.auto.points:1;
-        
+        var pLimit = $scope.auto.sizing == 'points' ? $scope.auto.points : 1;
+
         // make sure that point and question count limits are sane...
         var qUpperLimit = 0;
         var pUpperLimit = 0;
-        
+
         // place to keep the list of questions from which to choose randomly...
         var questionPool = [];
 
-        for (var i=0; i<autoSelectedChapters.length; i++){
-          for(var j=0; j<$scope.chapters[autoSelectedChapters[i]].questions.length; j++){
+        for (var i = 0; i < autoSelectedChapters.length; i++) {
+          for (var j = 0; j < $scope.chapters[autoSelectedChapters[i]].questions.length; j++) {
             qUpperLimit += 1;
             pUpperLimit += $scope.chapters[autoSelectedChapters[i]].questions[j].points;
-            
+
             questionPool.push($scope.chapters[autoSelectedChapters[i]].questions[j]);
           }
         }
-        for (var i=0; i<autoSelectedSections.length; i++){
-          for(var j=0; j<$scope.commentary[autoSelectedSections[i]].questions.length; j++){
+        for (var i = 0; i < autoSelectedSections.length; i++) {
+          for (var j = 0; j < $scope.commentary[autoSelectedSections[i]].questions.length; j++) {
             qUpperLimit += 1;
             pUpperLimit += $scope.commentary[autoSelectedSections[i]].questions[j].points;
 
@@ -399,42 +441,43 @@
 
           }
         }
-        if(qLimit > qUpperLimit){
+        if (qLimit > qUpperLimit) {
           qLimit = qUpperLimit;
         }
-        if(pLimit > pUpperLimit){
+        if (pLimit > pUpperLimit) {
           pLimit = pUpperLimit;
         }
-        
+
 
         // first randomly select a chapter
-        while(qCount < qLimit && pCount < pLimit){
+        while (qCount < qLimit && pCount < pLimit) {
           // var randChap = $scope.chapters[autoSelectedChapters[Math.floor(Math.random()*autoSelectedChapters.length)]];
           // var randQues = randChap.questions[Math.floor(Math.random()*randChap.questions.length)];
-          var randQues = questionPool[Math.floor(Math.random()*questionPool.length)]
-          if(typeof randQues == 'undefined' || typeof usedTable[randQues.id] != 'undefined'){
+          var randQues = questionPool[Math.floor(Math.random() * questionPool.length)]
+          if (typeof randQues == 'undefined' || typeof usedTable[randQues.id] != 'undefined') {
             continue;
           }
-          usedTable[randQues.id]=randQues;
+          usedTable[randQues.id] = randQues;
           $scope.myTest.Questions.push(randQues);
-          
+
           // mark the UI for the question as selected
-          randQues.selected=true;
-          
-          if($scope.auto.sizing=='questions'){
+          randQues.selected = true;
+
+          if ($scope.auto.sizing == 'questions') {
             qCount += 1;
-          } else {
+          }
+          else {
             pCount += randQues.points;
           }
         }
-        
-        console.log("Done auto-generating questions.  qCount: "+qCount+", pCount: "+pCount);
-        
+
+        console.log("Done auto-generating questions.  qCount: " + qCount + ", pCount: " + pCount);
+
         // switch back to the manual selection tab to show results...
-        $scope.selectedTab=0;
-        
+        $scope.selectedTab = 0;
+
       }, function() {
-        
+
         // DOH!  No error handling cause I'm lazy...
       });
 
