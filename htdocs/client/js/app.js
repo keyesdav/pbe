@@ -164,7 +164,9 @@
     $scope.auto.sizing = "questions";
     $scope.auto.questions = 20;
     $scope.auto.order = "random";
-    $scope.auto.selected = [];
+    $scope.auto.selected={};
+    $scope.auto.selected.bible = [];
+    $scope.auto.selected.commentary = [];
 
     if (passedTestId != null && passedTestId != "") {
 
@@ -212,7 +214,8 @@
             }
           }
           
-          $scope.auto.selected=new Array($scope.chapters.length);
+          $scope.auto.selected.bible=new Array($scope.chapters.length);
+          $scope.auto.selected.commentary=new Array($scope.commentary.length);
         });
 
         var allProms = [testPromise, questionsPromise];
@@ -278,7 +281,8 @@
 
             $scope.chapters = questionSet.chapters;
             $scope.commentary = questionSet.commentary;
-            $scope.auto.selected=new Array($scope.chapters.length);
+            $scope.auto.selected.bible=new Array($scope.chapters.length);
+            $scope.auto.selected.commentary=new Array($scope.commentary.length);
 
             // hide the indicator
             // setTimeout(function(){
@@ -310,9 +314,13 @@
     
     $scope.handleAutoSelectAll = function(evt){
       var checked = $scope.auto.selectAll;
-      for(var i=0; i<$scope.auto.selected.length; i++){
-        $scope.auto.selected[i]=checked;
+      for(var i=0; i<$scope.auto.selected.bible.length; i++){
+        $scope.auto.selected.bible[i]=checked;
       }
+      for(var i=0; i<$scope.auto.selected.commentary.length; i++){
+        $scope.auto.selected.commentary[i]=checked;
+      }
+
     }
 
     $scope.autoGenerateQuestions = function(evt) {
@@ -323,18 +331,26 @@
         .ok('OK')
         .cancel('Cancel');
       $mdDialog.show(confirm).then(function() {
-        //console.log("selected chapters: "+$scope.auto.selected);
+        //console.log("selected chapters: "+$scope.auto.selected.bible);
         
         // loop through the selected chapters in the auto-select and then choose questions
         var autoSelectedChapters = [];
-        for(var i=0; i<$scope.auto.selected.length; i++){
-          if($scope.auto.selected[i]==true){
+        for(var i=0; i<$scope.auto.selected.bible.length; i++){
+          if($scope.auto.selected.bible[i]==true){
             autoSelectedChapters.push(i);
           }
         }
+
+        var autoSelectedSections = [];
+        for(var i=0; i<$scope.auto.selected.commentary.length; i++){
+          if($scope.auto.selected.commentary[i]==true){
+            autoSelectedSections.push(i);
+          }
+        }
+  
         
-        // if no chapters were selected, just return... nothing to do
-        if(autoSelectedChapters.length == 0){
+        // if no chapters or commentary sections were selected, just return... nothing to do
+        if(autoSelectedChapters.length == 0 && autoSelectedSections.length == 0){
           return;
         }
         
@@ -344,6 +360,11 @@
         for (var j = 0; j < $scope.chapters.length; j++) {
           for (var k = 0; k < $scope.chapters[j].questions.length; k++) {
             $scope.chapters[j].questions[k].selected = false;
+          }
+        }
+        for (var j = 0; j < $scope.commentary.length; j++) {
+          for (var k = 0; k < $scope.commentary[j].questions.length; k++) {
+            $scope.commentary[j].questions[k].selected = false;
           }
         }
 
@@ -357,10 +378,25 @@
         // make sure that point and question count limits are sane...
         var qUpperLimit = 0;
         var pUpperLimit = 0;
+        
+        // place to keep the list of questions from which to choose randomly...
+        var questionPool = [];
+
         for (var i=0; i<autoSelectedChapters.length; i++){
           for(var j=0; j<$scope.chapters[autoSelectedChapters[i]].questions.length; j++){
             qUpperLimit += 1;
             pUpperLimit += $scope.chapters[autoSelectedChapters[i]].questions[j].points;
+            
+            questionPool.push($scope.chapters[autoSelectedChapters[i]].questions[j]);
+          }
+        }
+        for (var i=0; i<autoSelectedSections.length; i++){
+          for(var j=0; j<$scope.commentary[autoSelectedSections[i]].questions.length; j++){
+            qUpperLimit += 1;
+            pUpperLimit += $scope.commentary[autoSelectedSections[i]].questions[j].points;
+
+            questionPool.push($scope.commentary[autoSelectedSections[i]].questions[j]);
+
           }
         }
         if(qLimit > qUpperLimit){
@@ -370,10 +406,12 @@
           pLimit = pUpperLimit;
         }
         
+
         // first randomly select a chapter
         while(qCount < qLimit && pCount < pLimit){
-          var randChap = $scope.chapters[autoSelectedChapters[Math.floor(Math.random()*autoSelectedChapters.length)]];
-          var randQues = randChap.questions[Math.floor(Math.random()*randChap.questions.length)];
+          // var randChap = $scope.chapters[autoSelectedChapters[Math.floor(Math.random()*autoSelectedChapters.length)]];
+          // var randQues = randChap.questions[Math.floor(Math.random()*randChap.questions.length)];
+          var randQues = questionPool[Math.floor(Math.random()*questionPool.length)]
           if(typeof randQues == 'undefined' || typeof usedTable[randQues.id] != 'undefined'){
             continue;
           }
@@ -396,6 +434,8 @@
         $scope.selectedTab=0;
         
       }, function() {
+        
+        // DOH!  No error handling cause I'm lazy...
       });
 
     }

@@ -132,9 +132,19 @@
                     <div layout="row" layout-align="start start" layout-wrap>
                         <div style="min-width: 140px" ng-repeat="chapter in chapters" layout="column" layout-align="start start">
                             <div>
-                                <md-checkbox sytle="margin: 0px" ng-model="auto.selected[chapter.number-1]">
+                                <md-checkbox sytle="margin: 0px" ng-model="auto.selected.bible[chapter.number-1]">
                                     <p style="margin-top: 16px;margin-bottom:0px">Chapter {{chapter.number}}</p>
                                     <p style="font-size: 12px; margin-top:-8px;margin-right:0px;margin-bottom:0px;color: grey;text-align:right">{{chapter.questions.length}} questions</p>
+                                </md-checkbox>
+                            </div>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start start" layout-wrap>
+                        <div style="min-width: 140px" ng-repeat="section in commentary" layout="column" layout-align="start start">
+                            <div>
+                                <md-checkbox sytle="margin: 0px" ng-model="auto.selected.commentary[0]">
+                                    <p style="margin-top: 16px;margin-bottom:0px">SDA Bible Commentary - Exodus</p>
+                                    <p style="font-size: 12px; margin-top:-8px;margin-right:0px;margin-bottom:0px;color: grey;text-align:right">{{section.questions.length}} questions</p>
                                 </md-checkbox>
                             </div>
                         </div>
