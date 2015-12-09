@@ -31,24 +31,20 @@
     $scope.sidebar = {};
     $scope.sidebar.tests = [{
       link: 'showTestManager',
-      title: 'Manage',
-      icon: 'dashboard'
+      title: 'Manage Tests',
+      icon: 'view_list'
     }, {
-      link: '',
-      title: 'History',
-      icon: 'attach_money'
-    }, {
-      link: '',
-      title: 'Messages',
-      icon: 'message'
+      link: 'showQuestionSheet',
+      title: 'Edit Questions',
+      icon: 'playlist_add_check'
     }];
     $scope.sidebar.members = [{
       link: 'manageUsers',
-      title: 'Manage',
-      icon: 'voicemail'
+      title: 'Manage Users',
+      icon: 'account_box'
     }, {
       link: 'trackMemberProgress',
-      title: 'Track',
+      title: 'Track Users',
       icon: 'dashboard'
     }];
 
@@ -69,6 +65,10 @@
       $mdSidenav('left').toggle();
     }
 
+    $scope.showTestManager = function(){
+      $state.go('tests');
+
+    }
 
     $scope.editStory = function($event) {
       $state.go('test-edit', {
@@ -368,7 +368,7 @@
     $scope.autoGenerateQuestions = function(evt) {
       var confirm = $mdDialog.confirm()
         .title('Overwrite Questions?')
-        .content('Any questions that you have manually selected for this test will be overwritten!  Are you sure that you want to continue?')
+        .content('Any question selections that you have mad manually for this test will be overwritten!  Are you sure that you want to continue?')
         .targetEvent(evt)
         .ok('OK')
         .cancel('Cancel');

@@ -262,7 +262,7 @@ function handleGetPbeQuestions(req, rsp){
   
   // call out to Google Apps Script function to read from a Spreadsheet
 //  var url="https://script.google.com/macros/s/AKfycbxqdxOL1U516tJ2Wj6afDPBl0XOGNfx8DZxyQjr4qsA2_TbewE/exec";
-  var url="https://script.google.com/macros/s/AKfycbxqdxOL1U516tJ2Wj6afDPBl0XOGNfx8DZxyQjr4qsA2_TbewE/exec";
+  var url="https://script.googleusercontent.com/macros/echo?user_content_key=kcmCxUsUK56Nfki0UAiObMLWegLAu7flhvNcZQKGgNpv0Va6lTiarpnAkVHw20zFZOCnvdb7X5TsGHffU9Tn1Zmi0yTWOx9Jm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnBYmqbOrKhTxt9rs0SpunoMI4zntA1TIqLd1TncMmQg44BqXhnwfNsWFr1QLIoJJoqOIp7sEUsJ2&lib=MrFP4SKACQZNm9EGau7Ha-skVom87tLIP";
   
   var questions = ttlCache.get("questions");
   
