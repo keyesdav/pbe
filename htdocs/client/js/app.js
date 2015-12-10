@@ -70,6 +70,10 @@
 
     }
 
+    $scope.showQuestionSheet = function(testId) {
+      window.open("https://docs.google.com/spreadsheets/d/1DnPIlQmBcuB8c0gjy_PWpwTJgSdLc63TgR03IC_Jrs0/edit#gid=0", "_blank");
+    }
+
     $scope.editStory = function($event) {
       $state.go('test-edit', {
         testId: "1"
