@@ -414,13 +414,18 @@
 		}
 
 		function addTitleSlide(test) {
+			
+			var totalPoints = 0;
+			for(var i=0;i<test.Questions.length;i++){
+				totalPoints += test.Questions[i].points;
+			}
 
 			var slide1 = "<img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'>" +
 				"<h1>PBE Quiz</h1></div>" +
 				"<div class='pbecontent'>" +
 				"<p class='q-text'><h2>" + test.Title + "</h2></p>" +
 				"<p class='q-text'>" + test.SubTitle + "</p><br/>" +
-				"<p class='q-intro'>" + test.Questions.length + " Questions<br/></p>" +
+				"<p class='q-intro'>" + test.Questions.length + " Questions / "+totalPoints+" Points<br/></p>" +
 				"</div>";
 			Reveal.add(slide1, null, "pbe_title");
 
