@@ -339,21 +339,36 @@
 			}]
 		});
 		
-		
+		var numChecks = 0;
+		var scoreCheckInt = -1;
 		Reveal.addEventListener( 'slidechanged', function( event ) {
 		    // event.previousSlide, event.currentSlide, event.indexh, event.indexv
 		    if(event.currentSlide.id == "pbe_results"){
 
 				var id = $.url().param('id');
-				var numChecks = 0;
+				numChecks = 0;
 
-		    	var scoreCheckInt = setInterval(function(){
+		    	scoreCheckInt = setInterval(function(){
+		    		
+		    		console.log("Checking for score...");
 		    		getScore(id).done(function(){
+		    			console.log("Score found!");
 		    			clearInterval(scoreCheckInt);
+		    		}).fail(function(){
+		    			console.log("Score NOT found.");
 		    		});
 		    		numChecks++;
-		    		if(numChecks > 20){
+		    		if(numChecks > 3){
+		    			
+		    			console.log("Max number of score checks exceeded... going to manual mode.")
+		    			numChecks=0;
 		    			clearInterval(scoreCheckInt);
+		    			scoreCheckInt=-1;
+		    			$("#score_progress").hide();
+						$("#score_progress_message").html("No score found.  Press <b>Refresh Score</b> to check again.");
+
+		    		} else {
+		    			console.log("Still more checks to do...");
 		    		}
 		    		
 		    	}, 10 * 1000);
@@ -497,6 +512,8 @@
 				// $("#chooseOrderMsg").text("Loading test...");
 				$("#score_progress").css('display', 'inline-block');
 				$("#score_progress_message").css('display', 'inline-block');
+				$("#score_progress_message").text("Waiting For Score...");
+				
 				$("#score_table").hide();
 				// $("#randomizeBtn").hide();
 				// $("#sequentializeBtn").hide();
@@ -523,7 +540,12 @@
 				$("#score_table").show();
 
 			}).fail(function(){
-				
+				// if we're not polling, tell the user something went wrong so that they can try again if they want
+				if(scoreCheckInt == -1){
+					$("#score_progress").hide();
+					$("#score_progress_message").html("No score found.  Press <b>Refresh Score</b> to check again.");
+				}
+
 			});
 			
 			return d;
