@@ -70,3 +70,112 @@
     border-style: solid;
     border-width: 1px;
 }
+
+.score-table {
+    border-spacing: 20px 0px;
+    width: 100%;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -ms-user-select: none;
+}
+
+.score-points {
+    min-width: 120px;
+    font-size: 120px;
+    text-align: center;
+    padding: 20px 10px 0px 10px;
+    margin: 0px 20px 0px 20px;
+    border-top: 1px solid;
+    border-right: 1px solid;
+    border-left: 1px solid;
+    cursor: pointer;
+}
+
+.score-points:focus {
+    outline: none;
+ }
+ 
+.score-percent {
+    
+    min-width: 120px;
+    height: 25px;
+    font-size: 25px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px 5px 10px 5px;
+    margin: 0px 10px 10px 10px;
+    cursor: pointer;
+    background-color: #eeeeee;
+    color: #444444;
+}
+
+.score-team {
+    font-size: 15px;
+    text-align: center;
+    padding: 0px 10px 20px 10px;
+    margin: 0px 20px 0px 20px;
+    border-right: 1px solid;
+    border-left: 1px solid;
+    border-bottom: 1px solid;
+    cursor: pointer;
+}
+
+.score-team:focus {
+    outline: none;
+ }
+
+
+.score-history-table {
+    border-spacing: 0px 0px;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -ms-user-select: none;
+
+
+}
+.score-history-current-row:focus {
+    outline: none;
+ }
+.score-history-table:focus {
+    outline: none;
+ }
+
+.score-team tr:focus {
+    outline: none;
+ }
+ 
+.score-history-current-row {
+    background-color: #ffff99;
+}
+
+.score-history-cell {
+    padding: 10px;
+
+}
+
+.score-question-number {
+    color: #0000aa;
+    font-size: 14px;
+    background-color: #eeeeff;
+    padding: 5px;
+    margin: 10px 0px 0px 0px;
+
+}
+
+.score-question-text {
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap;
+    
+    color: #000088;
+    font-size: 22px;
+    background-color: #eeeeff;
+    padding: 5px;
+    margin: 10px 0px 20px 0px;
+}

@@ -39,6 +39,7 @@
         
         var questionResource = null;
         var Test = null;
+        var Score = null;
         var selectedTestId = null;
         var selectedTest = null;
         var functions = null;
@@ -135,7 +136,69 @@
             saveRes.Questions = testToSave.Questions;
 
             return saveRes.$save();
-          }
+          },
+          
+          createScore: function(){
+            var ret = $resource('/api/pbe/score/:testId', {testId:'@testId'}, {
+              'get': { method:'GET', cache: false },
+              'save':{ method:'POST', cache: false},
+            });
+
+            return ret;
+            
+          },
+
+          
+          postScore: function(testId, teams, questions){
+            
+            if(Score == null){
+              Score = this.createScore();
+            }
+            
+            var scoreToPost = new Score();
+            scoreToPost.testId = testId;
+            scoreToPost.teams = [];
+            
+            for(var i=0; i< teams.length; i++){
+              var t = teams[i].tally;
+              
+              var totalPoints = 0;
+              var scoredPoints = 0;
+              for(var j=0; j<t.length; j++){
+                if(t[j] != -1){
+                  totalPoints += questions[j].points
+                  scoredPoints += t[j];
+                }
+
+              }
+              
+              if(totalPoints != 0){
+                var s = {};
+                s.totalPoints = totalPoints;
+                s.scoredPoints = scoredPoints;
+                s.percentage = +((Math.round(scoredPoints/totalPoints*10000)/10000)*100).toFixed(2);
+                scoreToPost.teams[i] = s;
+              } else {
+                var s = {};
+                s.totalPoints = totalPoints;
+                s.scoredPoints = scoredPoints;
+                s.percentage = 0.0;
+                scoreToPost.teams[i] = s;
+                
+              }
+            }
+            
+            var p = scoreToPost.$save();
+            p.then(function(){
+              console.log("score saved to server")
+            },function(e){
+              console.log("error saving score to server: "+e);
+            })
+          },
+          
+          getScore: function(score){
+            
+          },
           
         };
         

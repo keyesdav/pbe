@@ -1,26 +1,28 @@
-<md-content class="md-padding" layout-padding>
+<div layout="column" style="height:100%">
     <!--<md-whiteframe layout="column" layout-align="start start" layout-padding class="md-whiteframe-1dp">-->
-    <form style="width: 100%" name="userForm">
-        <div flex layout="column" layout-align="start start">
-            <md-input-container style="width: 100%">
-                <label>Test Title</label>
-                <input type="string" ng-model="myTest.Title" />
-            </md-input-container>
-            <md-input-container style="width: 100%">
-                <label>Test Subtitle</label>
-                <input type="string" ng-model="myTest.SubTitle" />
-            </md-input-container>
+    <div flex="none" style="width: 100%; height: 140px">
+        <form style="width: 100%" name="userForm">
+            <div flex layout="column" layout-align="start start">
+                <md-input-container style="width: 100%">
+                    <label>Test Title</label>
+                    <input type="string" ng-model="myTest.Title" />
+                </md-input-container>
+                <md-input-container style="width: 100%">
+                    <label>Test Subtitle</label>
+                    <input type="string" ng-model="myTest.SubTitle" />
+                </md-input-container>
+    
+            </div>
+        </form>
+    </div>
+    <md-tabs flex style="width: 100%" md-selected="selectedTab" class="md-accent">
+        <md-tab style="" label="Manual Selection">
 
-        </div>
-    </form>
-    <md-tabs md-selected="selectedTab" md-dynamic-height md-border-bottom class="md-accent" style="width:100%">
-        <md-tab label="Manual Selection">
-
-            <md-content layout="column" layout-align="center center">
+            <md-content style="" layout="column" layout-align="center center">
                 <div id="chapter-progress" style="width:100%" layout-align="center center">
                     <md-progress-circular md-mode="indeterminate"></md-progress-circular>
                 </div>
-                <section style="width:100%" ng-repeat="chapter in chapters">
+                <div style="width:100%" ng-repeat="chapter in chapters">
                     <md-subheader ng-if="chapter.questions.length > 0" class="chapterHeader md-primary">
                         <div layout="row" layout-align="start center">
                             <md-checkbox class="q-check" ng-model="chapter.selectAll" ng-change="handleChangeSelectAll(chapter)" aria-label="chapter.number"></md-checkbox>
@@ -42,12 +44,12 @@
                             <div class="q-points">{{question.points}}</div>
                             <div class="q-text">{{question.question}}</div>
                             </p>
-                            <!--<md-icon class="md-secondary" ng-click="doSecondaryAction($event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
+                            <md-icon class="md-secondary" ng-click="doSecondaryAction($event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>
                             <md-divider></md-divider>
                         </md-list-item>
                     </md-list>
-                </section>
-                <section style="width:100%" ng-repeat="section in commentary">
+                </div>
+                <div style="width:100%" ng-repeat="section in commentary">
                     <md-subheader ng-if="section.questions.length > 0" class="chapterHeader md-primary">
                         <div layout="row" layout-align="start center">
                             <md-checkbox class="q-check" ng-model="section.selectAll" ng-change="handleChangeSelectAll(section)" aria-label="section.section"></md-checkbox>
@@ -69,11 +71,11 @@
                             <div class="q-points">{{question.points}}</div>
                             <div class="q-text">{{question.question}}</div>
                             </p>
-                            <!--<md-icon class="md-secondary" ng-click="doSecondaryAction($event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
+                            <md-icon class="md-secondary" ng-click="doSecondaryAction($event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>
                             <md-divider></md-divider>
                         </md-list-item>
                     </md-list>
-                </section>
+                </div>
 
             </md-content>
         </md-tab>
@@ -159,19 +161,9 @@
             </div>
         </md-tab>
     </md-tabs>
-    <!--<label>Tags</label>-->
-    <!--<md-chips-->
-    <!--    ng-model="Tags"-->
-    <!--    placeholder="Add"-->
-    <!--    readonly="false"-->
-    <!--    >-->
-
-    <!--</md-chips>-->
-    <!--</md-whiteframe>-->
     <div style="min-height:100px"></div>
-
+</div>
     <div class="pbe-actions-fixed" layout="row" layout-align="end center">
         <md-button class="md-raised" ng-click="cancel()"> Cancel </md-button>
         <md-button class="md-raised md-primary" ng-click="save()"> Save </md-button>
     </div>
-</md-content>

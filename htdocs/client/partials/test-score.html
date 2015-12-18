@@ -1,0 +1,88 @@
+<div layout="column" style="height: 100%" md-swipe-left="nextQuestion()" md-swipe-right="previousQuestion()">
+    <div flex="none" style="width: 100%; height: 350px" layout-padding>
+        <!--<md-whiteframe layout="column" layout-align="start start" layout-padding class="md-whiteframe-1dp">-->
+        <table class="score-table">
+            <tr>
+                <td class="score-percent">
+                    {{calculatePercentage(0)}}%
+                </td>
+                <td class="score-percent">
+                    {{calculatePercentage(1)}}%
+                </td>
+            </tr>
+            <tr>
+                <td class="score-points" ng-click="rotateScore(0)">
+                    <div md-ink-ripple style="position:relative">
+                        <b>{{score.teams[0].tally[score.currentQuestionNumber]==-1 ? (score.questions[score.currentQuestionNumber].points) : (score.teams[0].tally[score.currentQuestionNumber])}}</b>
+                    </div>
+                </td>
+                <td class="score-points" ng-click="rotateScore(1)">
+                    <div md-ink-ripple style="position:relative">
+                        <b>{{score.teams[1].tally[score.currentQuestionNumber]==-1 ? (score.questions[score.currentQuestionNumber].points) : (score.teams[1].tally[score.currentQuestionNumber])}}</b>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="score-team" ng-click="rotateScore(0)">Team A</td>
+                <td class="score-team" ng-click="rotateScore(1)">Team B</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
+                    <p class="score-question-number">Question #{{score.currentQuestionNumber+1}} for {{score.questions[score.currentQuestionNumber].points}} possible points</p>
+                    <p class="score-question-text">{{score.questions[score.currentQuestionNumber].question}}</p>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <md-grid-list md-cols="1" md-row-height="30px">
+        <md-grid-tile layout-fill>
+            <md-grid-list md-cols="4" md-row-height="30px" layout-fill>
+                <md-grid-tile><b>Question</b></md-grid-tile>
+                <md-grid-tile><b>Points</b></md-grid-tile>
+                <md-grid-tile><b>Team A</b></md-grid-tile>
+                <md-grid-tile><b>Team B</b></md-grid-tile>
+            </md-grid-list>
+        </md-grid-tile>
+    </md-grid-list>
+
+    <md-content flex layout="column" layout-align="center center" layout-padding>
+        <!--<table class="score-history-table">-->
+        <!--    <tr>-->
+        <!--        <th>Question</th>-->
+        <!--        <th>Points</th>-->
+        <!--        <th>Team A</th>-->
+        <!--        <th>Team B</th>-->
+
+        <!--    </tr>-->
+        <!--    <tr ng-class="$index==score.currentQuestionNumber?'score-history-current-row':''" ng-repeat="question in score.questions" ng-click="selectQuestion($index)">-->
+        <!--        <td class="score-history-cell">{{$index+1}}</td>-->
+        <!--        <td class="score-history-cell">{{question.points}}</td>-->
+        <!--        <td class="score-history-cell">-->
+        <!--            {{score.teams[0].tally[$index]==-1?"":score.teams[0].tally[$index]}}-->
+        <!--        </td>-->
+        <!--        <td class="score-history-cell">-->
+        <!--            {{score.teams[1].tally[$index]==-1?"":score.teams[1].tally[$index]}}-->
+        <!--        </td>-->
+        <!--    </tr>-->
+        <!--</table>-->
+        <md-grid-list class="score-history-table" md-cols="1" md-row-height="30px" layout-fill>
+            <md-grid-tile ng-repeat="question in score.questions" style="width:100%">
+                <md-grid-list md-cols="4" md-row-height="30px" layout-fill ng-class="$index==score.currentQuestionNumber?'score-history-current-row':''" ng-click="selectQuestion($index)">
+                    <md-grid-tile>{{$index+1}}</md-grid-tile>
+                    <md-grid-tile>{{question.points}}</md-grid-tile>
+                    <md-grid-tile>{{score.teams[0].tally[$index]==-1?"":score.teams[0].tally[$index]}}</md-grid-tile>
+                    <md-grid-tile>{{score.teams[1].tally[$index]==-1?"":score.teams[1].tally[$index]}}</md-grid-tile>
+                </md-grid-list>
+            </md-grid-tile>
+
+        </md-grid-list>
+    </md-content>
+    <div style="min-height:110px"></div>
+</div>
+
+<div class="pbe-actions-fixed" layout="row" layout-align="end center">
+    <md-button class="md-raised" ng-click="cancel()"> Cancel </md-button>
+    <md-button class="md-raised md-primary" ng-click="postScore()"> Post Score </md-button>
+</div>

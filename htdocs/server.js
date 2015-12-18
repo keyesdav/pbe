@@ -13,6 +13,8 @@ var uuid     = require('uuid');
 var bodyParser = require('body-parser');
 var NodeCache = require( "node-cache" );
 
+var scoreCache = new NodeCache( { stdTTL: (60*5), checkperiod: 60});
+
 var ttlCache = new NodeCache( { stdTTL: 28800, checkperiod: 600 } );  // cache this for eight hours
 
 var awsCredentials = require('./aws.credentials.json');
@@ -75,6 +77,8 @@ app.post('/api/pbe/tests/:testId', handlePostCreateOrUpdatePbeTest);
 app.post('/api/pbe/tests', handlePostCreateOrUpdatePbeTest);
 app.delete('/api/pbe/tests/:testId', handleDeletePbeTest);
 app.delete('/api/pbe/cache', handleDeleteCache);
+app.post('/api/pbe/score/:testId', handlePostScore);
+app.get('/api/pbe/score/:testId', handleGetScore);
 
 
 /////////////////////////
@@ -419,4 +423,37 @@ function handleDeletePbeTest(req, rsp){
 function handleDeleteCache(req, rsp){
   
   ttlCache.delete('questions');
+}
+
+
+function handlePostScore(req, rsp){
+  
+  // pull the score from the request body
+  var score = req.body;
+
+  // first, try to get the testId from the URL
+  var testId = req.params.testId;
+  
+  scoreCache.set(testId, score);
+  
+  rsp.json(score);
+
+  
+}
+
+function handleGetScore(req, rsp){
+  
+  // first, get the testId from the URL
+  var testId = req.params.testId;
+
+  var score = scoreCache.get(testId);
+  
+  if(typeof score == 'undefined'){
+    rsp.status(404).json({error: 'Recent score for test with id '+testId+' not found.'});
+  }
+  
+  else {
+    rsp.json(score);
+  }
+  
 }

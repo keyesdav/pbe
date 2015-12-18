@@ -48,7 +48,7 @@
 			width: 40px;
 			height: 40px;
 			position: relative;
-			display: none;
+			display: inline-block;
 		}
 		
 		.sk-circle .sk-child {
@@ -243,23 +243,23 @@
 				<img class='pbelogo' src='./img/pbe-logo.png' />
 				<div class='pbetitle'>
 					<h1>PBE Manager</h1></div>
-				<div class='pbecontent'>
-					<p id="chooseOrderMsg">How do you want to present the questions in this test?</p>
-					      <div id="progress" class="sk-circle">
-					        <div class="sk-circle1 sk-child"></div>
-					        <div class="sk-circle2 sk-child"></div>
-					        <div class="sk-circle3 sk-child"></div>
-					        <div class="sk-circle4 sk-child"></div>
-					        <div class="sk-circle5 sk-child"></div>
-					        <div class="sk-circle6 sk-child"></div>
-					        <div class="sk-circle7 sk-child"></div>
-					        <div class="sk-circle8 sk-child"></div>
-					        <div class="sk-circle9 sk-child"></div>
-					        <div class="sk-circle10 sk-child"></div>
-					        <div class="sk-circle11 sk-child"></div>
-					        <div class="sk-circle12 sk-child"></div>
-					      </div>
-					<a id="randomizeBtn" class="btn">Random Order</a> <a id="sequentializeBtn" class="btn">Sequential Order</a>
+				<div style="width: 100%; text-align: center" class='pbecontent'>
+					<div id="progress" class="sk-circle">
+						<div class="sk-circle1 sk-child"></div>
+						<div class="sk-circle2 sk-child"></div>
+						<div class="sk-circle3 sk-child"></div>
+						<div class="sk-circle4 sk-child"></div>
+						<div class="sk-circle5 sk-child"></div>
+						<div class="sk-circle6 sk-child"></div>
+						<div class="sk-circle7 sk-child"></div>
+						<div class="sk-circle8 sk-child"></div>
+						<div class="sk-circle9 sk-child"></div>
+						<div class="sk-circle10 sk-child"></div>
+						<div class="sk-circle11 sk-child"></div>
+						<div class="sk-circle12 sk-child"></div>
+					</div>
+					<p id="chooseOrderMsg">Initializing</p>
+					<!--<a id="randomizeBtn" class="btn">Random Order</a> <a id="sequentializeBtn" class="btn">Sequential Order</a>-->
 					<br/>
 					<br/>
 					<p>
@@ -279,21 +279,21 @@
 	<script type="text/javascript" src="./bower_components/seedrandom/seedrandom.min.js"></script>
 
 	<script>
-		$("#randomizeBtn").click(function() {
-			$("#chooseOrderMsg").text("Loading test...");
-			$("#progress").show();
-			$("#randomizeBtn").hide();
-			$("#sequentializeBtn").hide();
-			setTimeout(getData("random"), 250);
+		// $("#randomizeBtn").click(function() {
+		// 	$("#chooseOrderMsg").text("Loading test...");
+		// 	$("#progress").show();
+		// 	$("#randomizeBtn").hide();
+		// 	$("#sequentializeBtn").hide();
+		// 	setTimeout(getData("random"), 250);
 
-		});
-		$("#sequentializeBtn").click(function() {
-			$("#chooseOrderMsg").text("Loading test...");
-			$("#progress").show();
-			$("#randomizeBtn").hide();
-			$("#sequentializeBtn").hide();
-			setTimeout(getData("sequential"), 250);
-		});
+		// });
+		// $("#sequentializeBtn").click(function() {
+		// 	$("#chooseOrderMsg").text("Loading test...");
+		// 	$("#progress").show();
+		// 	$("#randomizeBtn").hide();
+		// 	$("#sequentializeBtn").hide();
+		// 	setTimeout(getData("sequential"), 250);
+		// });
 		
 		// create a random number generator that creates repeatable patterns...
 		var localRng = new Math.seedrandom('pbe');
@@ -338,7 +338,32 @@
 				async: true
 			}]
 		});
+		
+		
+		Reveal.addEventListener( 'slidechanged', function( event ) {
+		    // event.previousSlide, event.currentSlide, event.indexh, event.indexv
+		    if(event.currentSlide.id == "pbe_results"){
 
+				var id = $.url().param('id');
+				var numChecks = 0;
+
+		    	var scoreCheckInt = setInterval(function(){
+		    		getScore(id).done(function(){
+		    			clearInterval(scoreCheckInt);
+		    		});
+		    		numChecks++;
+		    		if(numChecks > 20){
+		    			clearInterval(scoreCheckInt);
+		    		}
+		    		
+		    	}, 10 * 1000);
+		    }
+		} );
+		
+
+		$("#chooseOrderMsg").text("Loading test from cloud service...");
+		$("#progress").show();
+		setTimeout(getData("random"), 250);
 
 
 		function getData(order) {
@@ -363,6 +388,8 @@
 				// Reveal.remove(0);
 
 			});
+			
+			
 		}
 
 		function addSlides(test, order) {
@@ -395,9 +422,12 @@
 					testQs.splice(i, 1);
 					addSlidesForQuestion(qNum, q);
 				}
+				
+				addScoreSlide(test);
+				
 				setTimeout(function() {
 					Reveal.next();
-					Reveal.remove(0)
+					Reveal.remove(0);
 				}, 500);
 
 			});
@@ -432,6 +462,73 @@
 			// $("#pbe_title").attr("data-transition", "convex-in fade-out");
 
 		}
+		
+		function addScoreSlide(test){
+			
+
+			var slide1 = "<img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'>" +
+				"<h1>Results</h1></div>" +
+				"<div class='pbecontent score-slide'>" +
+				"<div id='score_progress' class='sk-circle score-progress'>"+
+        		"  <div class='sk-circle1 sk-child'></div>"+
+        		"  <div class='sk-circle2 sk-child'></div>"+
+        		"  <div class='sk-circle3 sk-child'></div>"+
+        		"  <div class='sk-circle4 sk-child'></div>"+
+        		"  <div class='sk-circle5 sk-child'></div>"+
+        		"  <div class='sk-circle6 sk-child'></div>"+
+        		"  <div class='sk-circle7 sk-child'></div>"+
+        		"  <div class='sk-circle8 sk-child'></div>"+
+        		"  <div class='sk-circle9 sk-child'></div>"+
+        		"  <div class='sk-circle10 sk-child'></div>"+
+        		"  <div class='sk-circle11 sk-child'></div>"+
+        		"  <div class='sk-circle12 sk-child'></div>"+
+      			"</div><br/>"+
+      			"<p id='score_progress_message'>Waiting For Score...</p>"+
+
+				"<table id='score_table' class='score-table'><tr><td id='team_a_correct' class='score-correct'>0/0</td><td id='team_b_correct' class='score-correct'>0/0</td></tr>"+
+				"<tr><td class='score-percent' id='team_a_percent'>0%</td><td class='score-percent' id='team_b_percent'>0%</td></tr>" +
+				"<tr><td class='score-team-name'>Team A</td><td class='score-team-name'>Team B</td></tr>" +
+				"</table><br/><br/>"+
+				"<div id='refreshScore' class='btn'>Refresh Score</div>"+
+				"</div>";
+			Reveal.add(slide1, null, "pbe_results");
+
+			$("#refreshScore").click(function() {
+				// $("#chooseOrderMsg").text("Loading test...");
+				$("#score_progress").css('display', 'inline-block');
+				$("#score_progress_message").css('display', 'inline-block');
+				$("#score_table").hide();
+				// $("#randomizeBtn").hide();
+				// $("#sequentializeBtn").hide();
+				// setTimeout(getScore(test.TestId), 250);
+				var d=getScore(test.TestId);
+			});
+
+
+			// $("#pbe_title").attr("data-transition", "convex-in fade-out");
+		}
+		
+		function getScore(id) {
+			var d = $.ajax("/api/pbe/score/" + id).done(function(sResp) {
+				var score = sResp;
+				
+
+				$("#team_a_correct").text("Score: "+score.teams[0].scoredPoints + "/" +score.teams[0].totalPoints);
+				$("#team_a_percent").text(score.teams[0].percentage.toFixed(2)+"%");
+				$("#team_b_correct").text("Score: "+score.teams[1].scoredPoints + "/" +score.teams[0].totalPoints);
+				$("#team_b_percent").text(score.teams[1].percentage.toFixed(2)+"%");
+	
+				$("#score_progress").hide();
+				$("#score_progress_message").hide();
+				$("#score_table").show();
+
+			}).fail(function(){
+				
+			});
+			
+			return d;
+		}
+		
 
 		function addSlidesForQuestion(qNum, question) {
 

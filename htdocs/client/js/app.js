@@ -16,10 +16,10 @@
         templateUrl: 'partials/test-edit.html',
         controller: 'TestEditController'
       })
-      .state('foo', {
-        url: '/foo/:fooId',
-        templateUrl: 'partials/foo.html',
-        controller: 'FooController'
+      .state('test-score', {
+        url: '/score/:testId',
+        templateUrl: 'partials/test-score.html',
+        controller: 'ScoreController'
       })
 
   }]);
@@ -125,7 +125,7 @@
 
 
 
-  app.controller("TestController", function($scope, $state, PbeService) {
+  app.controller("TestController", function($scope, $state, $mdDialog, PbeService) {
 
     $scope.$parent.selectedTestId = "";
 
@@ -137,14 +137,14 @@
       return $scope.tests.count;
     }
 
-    $scope.handleMenuClick = function(menu, testId) {
+    $scope.handleMenuClick = function(menu, testId, evt) {
       if (menu == "Edit") {
 
         $scope.editTest(testId);
       }
 
       else if (menu == "Delete") {
-        $scope.deleteTest(testId);
+        $scope.deleteTest(testId, evt);
       }
 
       else if (menu == "Present") {
@@ -152,7 +152,7 @@
       }
 
       else if (menu == "Score") {
-
+        $scope.scoreTest(testId)
       }
 
     }
@@ -160,6 +160,25 @@
     $scope.presentTest = function(testId) {
       window.open("/slides?id=" + testId, "_blank");
     }
+
+    $scope.scoreTest = function(testId) {
+
+      PbeService.setSelectedTestId(testId);
+
+      for (var i = 0; i < $scope.tests.length; i++) {
+        if ($scope.tests[i].TestId == testId) {
+          PbeService.setSelectedTest($scope.tests[i]);
+          break;
+        }
+      }
+
+      $state.go('test-score', {
+        "testId": testId
+      });
+      // $state.go('test-edit');
+
+    }
+
 
     $scope.editTest = function(testId) {
 
@@ -187,11 +206,25 @@
       }
     }
 
-    $scope.deleteTest = function(testId) {
-      PbeService.deleteTest(testId);
-      PbeService.invalidateTestList();
-      $state.go($state.current, {}, {
-        reload: true
+    $scope.deleteTest = function(testId, evt) {
+      
+      var confirm = $mdDialog.confirm()
+        .title('Delete Test?')
+        .content('Are you sure that you want to delete this test?')
+        .targetEvent(evt)
+        .ok('OK')
+        .cancel('Cancel');
+      $mdDialog.show(confirm).then(function() {
+
+        PbeService.deleteTest(testId);
+        PbeService.invalidateTestList();
+        $state.go($state.current, {}, {
+          reload: true
+        });
+        
+      }, function() {
+
+        // DOH!  No error handling cause I'm lazy...
       });
 
     }
@@ -372,7 +405,7 @@
     $scope.autoGenerateQuestions = function(evt) {
       var confirm = $mdDialog.confirm()
         .title('Overwrite Questions?')
-        .content('Any question selections that you have mad manually for this test will be overwritten!  Are you sure that you want to continue?')
+        .content('Any question selections that you have made manually for this test will be overwritten!  Are you sure that you want to continue?')
         .targetEvent(evt)
         .ok('OK')
         .cancel('Cancel');
@@ -536,7 +569,177 @@
   });
 
 
-  app.controller("FooController", function($scope, $state, $q, $stateParams, $cacheFactory, PbeTests, PbeQuestions) {});
+  app.controller("ScoreController", function($scope, $state, $q, $stateParams, $timeout, PbeService){
+  
+    var passedTestId = $stateParams.testId;
+    
+    $scope.score = {};
+    $scope.score.currentQuestionNumber = 0;
+    $scope.score.questions = [];
+    $scope.score.teams=new Array(2);
+    $scope.score.teams[0] = {};
+    $scope.score.teams[0].tally=[-1];
+    $scope.score.teams[1] = {};
+    $scope.score.teams[1].tally=[-1];
+    
+    
+
+
+    if (passedTestId != null && passedTestId != "") {
+
+      //init things so that they have a value before the return of the API call
+      $scope.myTest = {};
+      $scope.myTest.TestId = "";
+      $scope.myTest.Title = "...";
+      $scope.myTest.SubTitle = "...";
+      $scope.myTest.Questions = [];
+
+
+      $timeout(function() {
+        var testPromise = null;
+
+        var ss = PbeService.getSelectedTest();
+        if (ss == null || ss.TestId != passedTestId) {
+          testPromise = PbeService.getTest(passedTestId).$promise;
+          testPromise.then(function(test) {
+            $scope.myTest = test;
+            
+            $scope.score.questions = $scope.myTest.Questions;
+            $scope.score.teams[0].tally = new Array($scope.myTest.Questions.length);
+            $scope.score.teams[1].tally = new Array($scope.myTest.Questions.length);
+
+            for(var i=1; i<$scope.myTest.Questions.length; i++){
+              $scope.score.teams[0].tally[i] = -1;
+              $scope.score.teams[1].tally[i] = -1;
+              
+            }
+            
+            randomizeQs();
+            
+          });
+        }
+        else if (ss != null && ss.TestId == passedTestId) {
+          $scope.myTest = ss;
+          $scope.score.questions = $scope.myTest.Questions;
+
+          $scope.score.teams[0].tally = new Array($scope.myTest.Questions.length);
+          $scope.score.teams[1].tally = new Array($scope.myTest.Questions.length);
+
+          for(var i=1; i<$scope.myTest.Questions.length; i++){
+            $scope.score.teams[0].tally[i] = -1;
+            $scope.score.teams[1].tally[i] = -1;
+            
+          }
+          
+          randomizeQs();
+        }
+        
+        
+        function randomizeQs() {
+          // randomly organize the questions (in the same order that's used in the test presentation)
+  	    	var localRng = new Math.seedrandom('pbe');
+  	    	var randQs = [];
+  				while ($scope.score.questions.length > 0) {
+  					var i = Math.floor(localRng() * $scope.score.questions.length);
+  					var q = $scope.score.questions[i];
+  					$scope.score.questions.splice(i, 1);
+  					randQs.push(q);
+          }
+          $scope.score.questions = randQs;
+  
+          // set the first question scores
+          $scope.score.teams[0].tally[0] = $scope.score.questions[0].points;
+          $scope.score.teams[1].tally[0] = $scope.score.questions[0].points;
+        }
+        
+
+
+      }, 250);
+    }
+  
+    $scope.rotateScore = function(team){
+      if($scope.score.teams[team].tally[$scope.score.currentQuestionNumber] == -1){
+        $scope.score.teams[team].tally[$scope.score.currentQuestionNumber] = $scope.score.questions[$scope.score.currentQuestionNumber].points;
+      }
+      
+      $scope.score.teams[team].tally[$scope.score.currentQuestionNumber]--;
+      
+      if($scope.score.teams[team].tally[$scope.score.currentQuestionNumber] < 0){
+        $scope.score.teams[team].tally[$scope.score.currentQuestionNumber] = $scope.score.questions[$scope.score.currentQuestionNumber].points;
+      }
+    }
+    
+    $scope.nextQuestion = function(){
+      $scope.score.currentQuestionNumber++;
+      if($scope.score.currentQuestionNumber >= $scope.score.questions.length){
+        $scope.score.currentQuestionNumber = $scope.score.questions.length-1;
+      }
+      
+      if($scope.score.teams[0].tally[$scope.score.currentQuestionNumber] == -1){
+        $scope.score.teams[0].tally[$scope.score.currentQuestionNumber] = $scope.score.questions[$scope.score.currentQuestionNumber].points;
+      }
+      if($scope.score.teams[1].tally[$scope.score.currentQuestionNumber] == -1){
+        $scope.score.teams[1].tally[$scope.score.currentQuestionNumber] = $scope.score.questions[$scope.score.currentQuestionNumber].points;
+      }
+    }
+
+    $scope.previousQuestion = function(){
+      $scope.score.currentQuestionNumber--;
+      if($scope.score.currentQuestionNumber < 0){
+        $scope.score.currentQuestionNumber = 0;
+      }
+
+      if($scope.score.teams[0].tally[$scope.score.currentQuestionNumber] == -1){
+        $scope.score.teams[0].tally[$scope.score.currentQuestionNumber] = $scope.score.questions[$scope.score.currentQuestionNumber].points;
+      }
+      if($scope.score.teams[1].tally[$scope.score.currentQuestionNumber] == -1){
+        $scope.score.teams[1].tally[$scope.score.currentQuestionNumber] = $scope.score.questions[$scope.score.currentQuestionNumber].points;
+      }
+
+
+    }
+    
+    $scope.selectQuestion = function(ind){
+      $scope.score.currentQuestionNumber = ind;
+      
+      if($scope.score.teams[0].tally[$scope.score.currentQuestionNumber] == -1){
+        $scope.score.teams[0].tally[$scope.score.currentQuestionNumber] = $scope.score.questions[$scope.score.currentQuestionNumber].points;
+      }
+      if($scope.score.teams[1].tally[$scope.score.currentQuestionNumber] == -1){
+        $scope.score.teams[1].tally[$scope.score.currentQuestionNumber] = $scope.score.questions[$scope.score.currentQuestionNumber].points;
+      }
+
+    }
+
+    $scope.calculatePercentage = function(team){
+      
+      var t = $scope.score.teams[team].tally;
+      var totalPoints = 0;
+      var scoredPoints = 0;
+      
+      for(var i=0;i<t.length;i++){
+        if(t[i] != -1){
+          totalPoints += $scope.score.questions[i].points
+          scoredPoints += t[i];
+        }
+      }
+      
+      if(totalPoints != 0){
+        return +((Math.round(scoredPoints/totalPoints*10000)/10000)*100).toFixed(2);
+      } else {
+        return 0;
+      }
+      
+    }
+    
+    $scope.postScore = function(){
+      PbeService.postScore($scope.myTest.TestId, $scope.score.teams, $scope.score.questions);
+    }
+
+
+  });
+
+  // app.controller("FooController", function($scope, $state, $q, $stateParams, $cacheFactory, PbeTests, PbeQuestions) {});
 
 
 })();

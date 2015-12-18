@@ -34,6 +34,9 @@
   <!--<script src="/bower/angular-ui-router-anim-in-out/anim-in-out.js"></script>-->
   <script src="/bower/angular-resource/angular-resource.min.js"></script>
   <script src="/bower/ngSticky/dist/sticky.min.js"></script>
+  
+	<script type="text/javascript" src="/bower/seedrandom/seedrandom.min.js"></script>
+
 
   <script type="text/javascript" src="/js/app.js"></script>
   <script type="text/javascript" src="/js/services.js"></script>
@@ -43,7 +46,7 @@
 
 </head>
 
-<body layout="row" ng-controller="MainAppController">
+<body layout="row" ng-controller="MainAppController" style="overflow-y:hidden">
   <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-swipe-left="toggleSidenav('close')" md-is-locked-open="$mdMedia('gt-md')">
     <md-toolbar class="md-tall md-hue-2">
       <span flex></span>
@@ -72,8 +75,8 @@
     </md-list>
   </md-sidenav>
 
-  <div layout="column" flex>
-    <md-toolbar sticky>
+  <div layout="column" flex style="height: 100%">
+    <md-toolbar >
       <div class="md-toolbar-tools">
         <md-button class="md-icon-button" aria-label="Settings" hide-gt-md>
           <md-icon class="material-icons" ng-click="toggleSidenav()">menu</md-icon>
@@ -85,11 +88,11 @@
         <span flex></span>
       </div>
     </md-toolbar>
-    <md-content>
-    <div flex>
-      <div layout-fill ui-view></div>
-    </div>
-    </md-content>
+    <!--<md-content flex>-->
+      <div flex layout-fill>
+        <div layout-fill ui-view></div>
+      </div>
+    <!--</md-content>-->
   </div>
 </body>
 
