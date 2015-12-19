@@ -348,6 +348,9 @@
 				var id = $.url().param('id');
 				numChecks = 0;
 
+				if(scoreCheckInt != -1){
+					clearInterval(scoreCheckInt);
+				}
 		    	scoreCheckInt = setInterval(function(){
 		    		
 		    		console.log("Checking for score...");
@@ -358,7 +361,7 @@
 		    			console.log("Score NOT found.");
 		    		});
 		    		numChecks++;
-		    		if(numChecks > 3){
+		    		if(numChecks > 6){
 		    			
 		    			console.log("Max number of score checks exceeded... going to manual mode.")
 		    			numChecks=0;

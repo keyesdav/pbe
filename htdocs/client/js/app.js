@@ -24,7 +24,7 @@
 
   }]);
 
-  app.controller('MainAppController', ['$scope', '$state', '$mdBottomSheet', '$mdSidenav', '$mdDialog', 'PbeTests', function($scope, $state, $mdBottomSheet, $mdSidenav, $mdDialog, PbeTests) {
+  app.controller('MainAppController', ['$scope', '$state', '$mdBottomSheet', '$mdSidenav', '$mdDialog', '$mdComponentRegistry', 'PbeTests', function($scope, $state, $mdBottomSheet, $mdSidenav, $mdDialog, $mdComponentRegistry, PbeTests) {
 
     $scope.activity = "";
 
@@ -61,17 +61,47 @@
       }
     }
 
+
+    // HACK, HACK, HACK
+    // the sidenav changes the overflow-y property on the body to "auto", which isn't nice on mobile wrt to "pull to refresh page" semantics
+    // the following code is used watch for the sidenav to close, and then manually set the overflow-y back to "hidden"
+    // https://github.com/angular/material/issues/3179
+    $scope.isOpen = function() { return false };
+    // Register binding function
+    $mdComponentRegistry
+                .when("left")
+                .then( function(sideNav){
+                    $scope.isOpen = angular.bind(sideNav, sideNav.isOpen );
+     });
+     $scope.$watch(function(scope){return scope.isOpen()},function(newValue,oldValue){
+        if(newValue == false){
+          console.log("sidenav closed...");
+          setTimeout(function(){
+            $("body").css("overflow-y", "hidden");
+          }, 250);
+        }
+     },true);
+     
+
     $scope.toggleSidenav = function(){
       $mdSidenav('left').toggle();
+
     }
 
     $scope.showTestManager = function(){
+      $mdSidenav('left').toggle();
+
+      
       $state.go('tests');
 
     }
 
     $scope.showQuestionSheet = function(testId) {
       window.open("https://docs.google.com/spreadsheets/d/1DnPIlQmBcuB8c0gjy_PWpwTJgSdLc63TgR03IC_Jrs0/edit#gid=0", "_blank");
+    }
+    
+    $scope.manageUsers = function(){
+      console.log("isOpen: "+$scope.isOpen());
     }
 
     $scope.editStory = function($event) {
@@ -570,6 +600,15 @@
 
 
   app.controller("ScoreController", function($scope, $state, $q, $stateParams, $timeout, PbeService){
+    
+    // warn the user that they are about to abandon the score
+    $scope.$on('$stateChangeStart', function( event ) {
+      var answer = confirm("Are you sure that you want to discard this scoring session?")
+      if (!answer) {
+          event.preventDefault();
+      }
+    });
+    
   
     var passedTestId = $stateParams.testId;
     
