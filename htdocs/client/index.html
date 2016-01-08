@@ -72,6 +72,14 @@
           <span class="navTitle">{{item.title}}</span><span flex></span>
         </div>
       </md-list-item>
+      <md-divider></md-divider>
+      <md-subheader>Practice</md-subheader>
+      <md-list-item class="navEntry" flex ng-repeat="item in sidebar.practice" ng-click="callFunction(item.link, $event)">
+        <div layout="row">
+          <md-icon class="material-icons">{{item.icon}}</md-icon>
+          <span class="navTitle">{{item.title}}</span><span flex></span>
+        </div>
+      </md-list-item>
     </md-list>
   </md-sidenav>
 

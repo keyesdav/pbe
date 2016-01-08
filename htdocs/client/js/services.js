@@ -73,10 +73,19 @@
             return questionResource.get({"book": "Exodus"});
           },
           
+          getQuestionChapters: function(b){
+            var chapRes = $resource('/api/pbe/questions/:book/chapters', {book:'@book'}, {
+                'get': { method:'GET', cache: true },
+                'query': { method:'GET', cache: true, isArray:true }
+              });
+              
+              return chapRes.get({"book": b});
+          },
+          
           getTests: function() {
             if(Test == null){
               Test = this.createTest();
-          }
+            }
             
             return Test.query();
           },

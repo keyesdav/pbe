@@ -21,6 +21,12 @@
         templateUrl: 'partials/test-score.html',
         controller: 'ScoreController'
       })
+      
+      .state('practice-select', {
+        url: '/practice/select',
+        templateUrl: 'partials/practice-select.html',
+        controller: 'PracticeController'
+      })
 
   }]);
 
@@ -46,6 +52,15 @@
       link: 'trackMemberProgress',
       title: 'Track Users',
       icon: 'dashboard'
+    }];
+    $scope.sidebar.practice = [{
+      link: 'practiceQuestions',
+      title: 'Quiz Me!',
+      icon: 'school'
+    }, {
+      link: 'practiceStats',
+      title: 'Quiz Stats',
+      icon: 'timeline'
     }];
 
     ///////////////////
@@ -111,6 +126,11 @@
 
     }
 
+    $scope.practiceQuestions = function($event){
+      $state.go('practice-select', {
+      });
+
+    }
 
   }]);
 
@@ -269,6 +289,8 @@
 
     $scope.selectedTab = 0;
 
+    $scope.totalSelected = 0;
+
     $scope.auto = {};
     $scope.auto.sizing = "questions";
     $scope.auto.questions = 20;
@@ -356,6 +378,7 @@
             var q = $scope.questionIdMap[qId];
             if (typeof q != 'undefined' && q != null) {
               q.selected = true;
+              $scope.totalSelected += 1;
             }
           }
 
@@ -405,6 +428,13 @@
       });
     }
 
+    $scope.updateSelectedCount = function(selected){
+      if(selected){
+        $scope.totalSelected += 1;
+      } else {
+        $scope.totalSelected -= 1;
+      }
+    }
 
     $scope.handleChangeSelectAll = function(chapter) {
 
@@ -416,6 +446,16 @@
       if (typeof chapter !== 'undefined' && typeof chapter.questions !== 'undefined') {
         for (var i = 0; i < chapter.questions.length; i++) {
           chapter.questions[i].selected = checked;
+        }
+      }
+      
+      // recount all of the selected checks to get an accurate count of what's selected...
+      $scope.totalSelected = 0;
+      for (var id in $scope.questionIdMap) {
+        if ($scope.questionIdMap.hasOwnProperty(id)) {
+            if($scope.questionIdMap[id].selected){
+              $scope.totalSelected += 1;
+            }
         }
       }
     }
@@ -539,6 +579,10 @@
         }
 
         console.log("Done auto-generating questions.  qCount: " + qCount + ", pCount: " + pCount);
+  
+        // reset the number of selected      
+        $scope.totalSelected = qCount;
+
 
         // switch back to the manual selection tab to show results...
         $scope.selectedTab = 0;
@@ -780,5 +824,24 @@
 
   // app.controller("FooController", function($scope, $state, $q, $stateParams, $cacheFactory, PbeTests, PbeQuestions) {});
 
+  app.controller("PracticeController", function($scope, $state, $q, $stateParams, $timeout, PbeService){
+    
+    //init things so that they have a value before the return of the API call
+    $scope.chapters = [];
+    $scope.commentary = [];
+    $scope.selected = {};
+    $scope.selected.bible=[];
+    $scope.selected.commentary=[];
+
+    var chapPromise = PbeService.getQuestionChapters("Exodus").$promise;
+    chapPromise
+      .then(function(questChaps) {
+        $scope.chapters = questChaps.chapters;
+        $scope.commentary = questChaps.commentary;
+        $scope.selected.bible = new Array($scope.chapters.length);
+        $scope.selected.commentary = new Array($scope.commentary.length);
+      });
+
+  });
 
 })();

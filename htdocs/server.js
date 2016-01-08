@@ -15,7 +15,7 @@ var NodeCache = require( "node-cache" );
 
 var scoreCache = new NodeCache( { stdTTL: (60*5), checkperiod: 60});
 
-var ttlCache = new NodeCache( { stdTTL: 28800, checkperiod: 600 } );  // cache this for eight hours
+var ttlCache = new NodeCache( { stdTTL: 600, checkperiod: 60 } );  // cache this for eight hours
 
 var awsCredentials = require('./aws.credentials.json');
 
@@ -71,6 +71,7 @@ app.use(bodyParser.json())
 // app.delete('/api/story/:publisherid/:storyid', handleDeleteStory);
 app.get('/api/bible/:book', handleGetBibleVerses);
 app.get('/api/pbe/questions/:book', handleGetPbeQuestions);
+app.get('/api/pbe/questions/:book/chapters', handleGetPbeQuestionChapters);
 app.get('/api/pbe/tests', handleGetPbeTests);
 app.get('/api/pbe/tests/:testId', handleGetPbeTest);
 app.post('/api/pbe/tests/:testId', handlePostCreateOrUpdatePbeTest);
@@ -264,8 +265,125 @@ function parseVerses(book, verseSpec){
 
 function handleGetPbeQuestions(req, rsp){
   
+  var chapters = req.query.chapter;
+  if(typeof chapters == 'undefined'){
+    chapters = [];
+  } else if(typeof chapters == 'string') {
+    chapters = [chapters];
+  }
+
+  var commentary = req.query.commentary;
+  if(typeof commentary == 'undefined'){
+    commentary = [];
+  } else if(typeof commentary == 'string') {
+    commentary = [commentary];
+  }
+
+
+
   // call out to Google Apps Script function to read from a Spreadsheet
-//  var url="https://script.google.com/macros/s/AKfycbxqdxOL1U516tJ2Wj6afDPBl0XOGNfx8DZxyQjr4qsA2_TbewE/exec";
+  //  var url="https://script.google.com/macros/s/AKfycbxqdxOL1U516tJ2Wj6afDPBl0XOGNfx8DZxyQjr4qsA2_TbewE/exec";
+  var url="https://script.googleusercontent.com/macros/echo?user_content_key=kcmCxUsUK56Nfki0UAiObMLWegLAu7flhvNcZQKGgNpv0Va6lTiarpnAkVHw20zFZOCnvdb7X5TsGHffU9Tn1Zmi0yTWOx9Jm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnBYmqbOrKhTxt9rs0SpunoMI4zntA1TIqLd1TncMmQg44BqXhnwfNsWFr1QLIoJJoqOIp7sEUsJ2&lib=MrFP4SKACQZNm9EGau7Ha-skVom87tLIP";
+  
+  var questions = ttlCache.get("questions");
+  
+  
+  if(typeof questions == 'undefined'){
+  
+    request({
+        followAllRedirects: true,
+        url: url
+      }, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        var rspJson = JSON.parse(response.body);
+        
+        // instrument with the total question count
+        countQuestions(rspJson);
+        
+        ttlCache.set("questions", rspJson);
+        
+        if(chapters.length > 0 || commentary.length > 0){
+          questions = filterQuestions(rspJson, chapters, commentary);
+
+          // instrument with the total filtered question count
+          countQuestions(questions);
+          
+        } else {
+          questions = rspJson;
+        }
+        
+        rsp.json(questions);
+      }
+    });
+  } else {
+
+      if(chapters.length > 0 || commentary.length > 0){
+        questions = filterQuestions(questions, chapters, commentary);
+
+        // instrument with the total filtered question count
+        countQuestions(questions);
+      }
+
+      rsp.json(questions);
+
+  }
+}
+
+function countQuestions(qs){
+  qs.chapterQuestions = 0;
+  qs.commentaryQuestions = 0;
+  for(var i=0;i<qs.chapters.length;i++){
+    qs.chapterQuestions += qs.chapters[i].questions.length;
+  }
+  for(var i=0;i<qs.commentary.length;i++){
+    qs.commentaryQuestions += qs.commentary[i].questions.length;
+  }
+}
+
+function filterQuestions(questions, includeChapters, includeCommentary){
+    var ret = JSON.parse(JSON.stringify(questions));
+    
+    for(var i=0; i<ret.chapters.length; i++){
+      var ch = ret.chapters[i];
+      var include = false;
+      
+      for(var j=0; j<includeChapters.length; j++){
+        if(ch.number == includeChapters[j]){
+          include=true;
+          break;
+        }
+      }
+      if( ! include){
+        ret.chapters.splice(i,1);
+        i--;
+      }
+    }
+    
+    for(var i=0; i<ret.commentary.length; i++){
+      var s = ret.commentary[i];
+      var include = false;
+      
+      for(var j=0; j<includeCommentary.length; j++){
+        if(s.section == includeCommentary[j]){
+          include=true;
+          break;
+        }
+      }
+      if( ! include){
+        ret.commentary.splice(i,1);
+        i--;
+      }
+    }
+
+
+    return ret;
+
+}
+
+function handleGetPbeQuestionChapters(req, rsp){
+  
+  // call out to Google Apps Script function to read from a Spreadsheet
+  //  var url="https://script.google.com/macros/s/AKfycbxqdxOL1U516tJ2Wj6afDPBl0XOGNfx8DZxyQjr4qsA2_TbewE/exec";
   var url="https://script.googleusercontent.com/macros/echo?user_content_key=kcmCxUsUK56Nfki0UAiObMLWegLAu7flhvNcZQKGgNpv0Va6lTiarpnAkVHw20zFZOCnvdb7X5TsGHffU9Tn1Zmi0yTWOx9Jm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnBYmqbOrKhTxt9rs0SpunoMI4zntA1TIqLd1TncMmQg44BqXhnwfNsWFr1QLIoJJoqOIp7sEUsJ2&lib=MrFP4SKACQZNm9EGau7Ha-skVom87tLIP";
   
   var questions = ttlCache.get("questions");
@@ -280,19 +398,33 @@ function handleGetPbeQuestions(req, rsp){
         var rspJson = JSON.parse(response.body);
         ttlCache.set("questions", rspJson);
         
-        rsp.json(rspJson);
+        rsp.json(stripQuestions(rspJson));
       }
     });
   } else {
-      rsp.json(questions);
+      rsp.json(stripQuestions(questions));
 
   }
-  // qhttp.read(url)
-  //   .then( function(content){
-  //     rsp.json(JSON.parse(content));
-  //   }
-  // );
 }
+
+function stripQuestions(questions){
+
+  var ret = JSON.parse(JSON.stringify(questions));
+  
+  // now loop through and blank out the questions...
+  for(var i=0; i<ret.chapters.length; i++){
+    ret.chapters[i].numQuestions = ret.chapters[i].questions.length;
+    ret.chapters[i].questions = [];
+  }
+  
+  ret.commentary[0].numQuestions = ret.commentary[0].questions.length;
+  ret.commentary[0].questions=[];
+  
+  return ret;
+  
+}
+
+
 
 function handleGetPbeTests(req, rsp){
 

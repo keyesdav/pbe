@@ -16,7 +16,7 @@
         </form>
     </div>
     <md-tabs flex style="width: 100%" md-selected="selectedTab" class="md-accent">
-        <md-tab style="" label="Manual Selection">
+        <md-tab style="" label="Manual Select">
 
             <md-content style="" layout="column" layout-align="center center">
                 <div id="chapter-progress" style="width:100%" layout-align="center center">
@@ -39,7 +39,7 @@
                             <md-divider></md-divider>
                         </div>
                         <md-list-item ng-repeat="question in chapter.questions" layout="row">
-                            <md-checkbox class="q-check" ng-model="question.selected" aria-label="{{question.verse}}"></md-checkbox>
+                            <md-checkbox class="q-check" ng-model="question.selected" ng-change="updateSelectedCount(question.selected)" aria-label="{{question.verse}}"></md-checkbox>
                             <div class="q-verse">{{question.verse}}</div>
                             <div class="q-points">{{question.points}}</div>
                             <div class="q-text">{{question.question}}</div>
@@ -79,7 +79,7 @@
 
             </md-content>
         </md-tab>
-        <md-tab label="Auto Selection">
+        <md-tab label="Auto Select">
             <div layout="column">
                 <div layout="row" layout-align="center center">
                     <md-button ng-click="autoGenerateQuestions($event)" style="width:50%;height:80px;margin-top:10px" class="md-raised" aria-label="Generate Questions">
@@ -164,6 +164,7 @@
     <div style="min-height:100px"></div>
 </div>
     <div class="pbe-actions-fixed" layout="row" layout-align="end center">
+        <div style="margin-right: 40px">{{totalSelected}} selected</div>
         <md-button class="md-raised" ng-click="cancel()"> Cancel </md-button>
         <md-button class="md-raised md-primary" ng-click="save()"> Save </md-button>
     </div>
