@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>PBE Testing Questions</title>
+
+	<meta name="description" content="Test of the Pathfinder Bible Experience competition.">
+	<meta name="author" content="David S. Keyes">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script type="text/javascript" src="./bower_components/purl/purl.js"></script>
+
+
+	<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+</head>
+
+<body>
+
+	<div id="questionContent">
+	</div>
+
+	<script src="lib/js/head.min.js"></script>
+	<script type="text/javascript" src="./bower_components/seedrandom/seedrandom.min.js"></script>
+
+	<script>
+
+		// create a random number generator that creates repeatable patterns...
+		var localRng = new Math.seedrandom('pbe');
+
+
+
+		$("#chooseOrderMsg").text("Loading test from cloud service...");
+		$("#progress").show();
+		setTimeout(getData("random"), 250);
+
+
+		function getData(order) {
+
+			// figure out the id of the test that we want to render
+			var id = $.url().param('id');
+
+
+			$.ajax("/api/pbe/tests/" + id).done(function(tResp) {
+				var test = tResp;
+
+				addTitleSlide(test);
+				addSlides(test, order);
+
+
+			});
+			
+			
+		}
+
+		function addSlides(test, order) {
+
+			var testQs = test.Questions;
+
+			var bibleDeferreds = [];
+
+			for (var j = 0; j < testQs.length; j++) {
+				
+				if(testQs[j].src != "SDA Bible Commentary"){
+					bibleDeferreds.push(instrumentQuestionWithBibleData(testQs[j]));
+				}
+			}
+
+
+			// after all of the bible verses have been loaded from the bible API, then generate slides...
+			$.when.apply($, bibleDeferreds).then(function() {
+
+				var qNum = 0;
+				while (testQs.length > 0) {
+					qNum++;
+					var i = 0;
+					if (order == "random") {
+						i = Math.floor(localRng() * testQs.length);
+					}
+					var q = testQs[i];
+					testQs.splice(i, 1);
+					addSlidesForQuestion(qNum, q);
+				}
+				
+
+				setTimeout(function() {
+					Reveal.next();
+					Reveal.remove(0);
+				}, 500);
+
+			});
+
+
+		}
+
+		function instrumentQuestionWithBibleData(question) {
+			var reqPromise = $.ajax("/api/bible/Exodus?verses=" + question.verse).done(function(bibleData) {
+				question.bibleData = bibleData;
+			});
+
+			return reqPromise;
+		}
+
+		function addTitleSlide(test) {
+			
+			var totalPoints = 0;
+			for(var i=0;i<test.Questions.length;i++){
+				totalPoints += test.Questions[i].points;
+			}
+
+			var slide1 = "<img src='./img/pbe-logo.png'/><div>" +
+				"<p><h2>" + test.Title + "</h2></p>" +
+				"<p>" + test.SubTitle + "</p>" +
+				"<p>" + test.Questions.length + " Questions / "+totalPoints+" Points<br/></p>" +
+				"</div><hr/>";
+
+			$("#questionContent").append(slide1);
+
+		}
+		
+
+		function addSlidesForQuestion(qNum, question) {
+
+
+			var time = 25;
+			time += (question.points - 1) * 5;
+
+			var slide1 =
+				"<p>Question #" + (qNum) + "</p>" +
+				"<div>" +
+				"<p>For " + question.points + " point" + ((question.points > 1) ? "s" : "") + " - According to " + question.src + " " +(typeof question.verse!='undefined'?question.verse:question.page) + ":" + "<br/></p>" +
+				"<p>" + question.question + "<br/></p>" +
+				"<p>Answer: " + question.answer + "</p>" +
+				"</div>";
+
+			var slide2 = "";
+				if(typeof question.bibleData != 'undefined'){
+					slide2 += 
+					"<div>" +
+					"<p>" + "Exodus " + question.verse + "</p>";
+					for (var b = 0; b < question.bibleData.verses.length; b++) {
+						slide2 += "<p><span >" + question.bibleData.verses[b].num + "</span>  " + question.bibleData.verses[b].text + "</p>";
+					}
+					slide2 += "</div>";
+				}
+
+
+			$("#questionContent").append(slide1);
+			$("#questionContent").append(slide2);
+			$("#questionContent").append("<hr/>");
+
+		}
+	</script>
+
+</body>
+
+</html>

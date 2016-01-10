@@ -1,0 +1,30 @@
+<div layout="column" style="height:100%">
+            <md-content style="" layout="column" layout-align="center center">
+                <div style="width:100%">
+                    <md-list>
+                        <div layout="row" layout-align="start center" layout-padding>
+                            <div class="q-leftpad"></div>
+                            <div class="q-verse"><u>Points</u></div>
+                            <div class="q-points"><u>Verse</u></div>
+                            <div class="q-text"><u>Question</u></div>
+                            </p>
+                            <md-divider></md-divider>
+                        </div>
+                        <md-list-item ng-repeat="question in testQuestions" layout="row">
+                            <div class="q-verse">{{question.points}}</div>
+                            <div class="q-points">{{question.verse}}</div>
+                            <div class="q-text">{{question.question}}</div>
+                            <md-divider></md-divider>
+                        </md-list-item>
+                        <md-list-item ng-repeat="question in testQuestions" layout="row">
+                            <div class="q-text">{{question.question}}</div>
+                            <md-divider></md-divider>
+                        </md-list-item>
+                    </md-list>
+                </div>
+            </md-content>
+    <div style="min-height:100px"></div>
+</div>
+    <div class="pbe-actions-fixed" layout="row" layout-align="end center">
+        <md-button class="md-raised md-primary" ng-click="done()"> Done </md-button>
+    </div>

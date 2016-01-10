@@ -33,6 +33,7 @@
         templateUrl: 'partials/practice-progress.html',
         controller: 'PracticeController'
       })
+
   }]);
 
   app.controller('MainAppController', ['$scope', '$state', '$mdBottomSheet', '$mdSidenav', '$mdDialog', '$mdComponentRegistry', 'PbeTests', function($scope, $state, $mdBottomSheet, $mdSidenav, $mdDialog, $mdComponentRegistry, PbeTests) {
@@ -214,11 +215,18 @@
       else if (menu == "Score") {
         $scope.scoreTest(testId)
       }
+      else if (menu == "Report") {
+        $scope.report(testId)
+      }
 
     }
 
     $scope.presentTest = function(testId) {
       window.open("/slides?id=" + testId, "_blank");
+    }
+    
+    $scope.report = function(testId) {
+      window.open("/slides/report.html?id=" + testId, "_blank");
     }
 
     $scope.scoreTest = function(testId) {
@@ -861,5 +869,6 @@
       });
 
   });
+
 
 })();
