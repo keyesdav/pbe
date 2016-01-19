@@ -43,6 +43,7 @@
         var selectedTestId = null;
         var selectedTest = null;
         var functions = null;
+        var practiceQuestions = null;
         
         return {
           
@@ -62,15 +63,24 @@
             return selectedTest;
           },
           
-          getQuestions: function(){
-            if(questionResource == null){
+          getQuestions: function(chaps){
+            if(questionResource == null || typeof chaps != 'undefined'){
               questionResource = $resource('/api/pbe/questions/:book', {book:'@book'}, {
                 'get': { method:'GET', cache: true },
                 'query': { method:'GET', cache: true, isArray:true }
               });
             }
             
-            return questionResource.get({"book": "Exodus"});
+            
+            var reqParams = { "book": "Exodus" };
+            if(typeof chaps != 'undefined'){
+              reqParams.chapter=[];
+              for(var i=0;i<chaps.length; i++){
+                reqParams.chapter.push(chaps[i]);
+              }
+            }
+            
+            return questionResource.get(reqParams);
           },
           
           getQuestionChapters: function(b){
@@ -81,6 +91,7 @@
               
               return chapRes.get({"book": b});
           },
+          
           
           getTests: function() {
             if(Test == null){
@@ -208,6 +219,14 @@
           getScore: function(score){
             
           },
+          
+          setPracticeQuestions: function(qs){
+            practiceQuestions = qs;
+          },
+          
+          getPracticeQuestions: function(){
+            return practiceQuestions;
+          }
           
         };
         

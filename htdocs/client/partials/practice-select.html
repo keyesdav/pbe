@@ -1,13 +1,13 @@
 <div layout="column" style="height:100%">
     <!--<md-whiteframe layout="column" layout-align="start start" layout-padding class="md-whiteframe-1dp">-->
-            <md-content style="" layout="column" layout-align="center center">
-                <fieldset class="border-standard">
-                    <legend>Test Content</legend>
-                    <div layout="row" layout-align="start start" layout-wrap>
-                        <md-checkbox sytle="" ng-model="auto.selectAll" ng-change="handleAutoSelectAll($event)">
-                            <p>Select All</p>
-                        </md-checkbox>
-                    </div>
+            <md-content flex layout="column" layout-align="start start">
+                <!--<fieldset class="border-standard">-->
+                <!--    <legend>Test Content</legend>-->
+                    <!--<div layout="row" layout-align="start start" layout-wrap>-->
+                    <!--    <md-checkbox sytle="" ng-model="auto.selectAll" ng-change="handleAutoSelectAll($event)">-->
+                    <!--        <p>Select All</p>-->
+                    <!--    </md-checkbox>-->
+                    <!--</div>-->
                     <div layout="row" layout-align="start start" layout-wrap>
                         <div style="min-width: 140px" ng-repeat="chapter in chapters" layout="column" layout-align="start start">
                             <div>
@@ -28,12 +28,12 @@
                             </div>
                         </div>
                     </div>
-                </fieldset>
+                <!--</fieldset>-->
             </md-content>
             
     <div style="min-height:100px"></div>
 </div>
     <div class="pbe-actions-fixed" layout="row" layout-align="end center">
         <md-button class="md-raised" ng-click="cancel()"> Cancel </md-button>
-        <md-button class="md-raised md-primary" ng-click="save()"> Practice! </md-button>
+        <md-button class="md-raised md-primary" ng-click="practice()"> Practice! </md-button>
     </div>

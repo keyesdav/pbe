@@ -28,6 +28,12 @@
         controller: 'PracticeController'
       })
 
+      .state('practice-work', {
+        url: '/practice/work/:qnum/:qstate',
+        templateUrl: 'partials/practice-work.html',
+        controller: 'PracticeController'
+      })
+
       .state('practice-progress', {
         url: '/practice/progress',
         templateUrl: 'partials/practice-progress.html',
@@ -226,7 +232,6 @@
     }
     
     $scope.report = function(testId) {
-      window.open("/slides/report.html?id=" + testId, "_blank");
     }
 
     $scope.scoreTest = function(testId) {
@@ -850,6 +855,10 @@
     $scope.selected = {};
     $scope.selected.bible=[];
     $scope.selected.commentary=[];
+    $scope.practiceQuestions=PbeService.getPracticeQuestions();
+    
+    $scope.qNum = $stateParams.qnum;
+    $scope.qState = $stateParams.qstate;
     
     // graph
     $scope.labels = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40"];
@@ -862,13 +871,89 @@
     var chapPromise = PbeService.getQuestionChapters("Exodus").$promise;
     chapPromise
       .then(function(questChaps) {
+        console.log("done loading question chapters...");
         $scope.chapters = questChaps.chapters;
         $scope.commentary = questChaps.commentary;
         $scope.selected.bible = new Array($scope.chapters.length);
         $scope.selected.commentary = new Array($scope.commentary.length);
       });
 
+
+    $scope.cancel = function($event) {
+      $state.go('tests');
+    };
+    
+    $scope.next = function($event) {
+      var nextQNum = $scope.qNum;
+      var nextQState = $scope.qState;
+      if($scope.qState == 'q'){
+        nextQState = 'a';
+      } else if($scope.qState == 'a'){
+        nextQState='q';
+        nextQNum++;
+      }
+      
+      if(nextQNum > $scope.practiceQuestions.length){
+        nextQState='s';
+      }
+      
+      $state.go('practice-work', {
+        "qnum": nextQNum,
+        "qstate": nextQState
+      })
+    }
+
+    $scope.prev = function($event) {
+      var nextQNum = $scope.qNum;
+      var nextQState = $scope.qState;
+      if(nextQState == 'a'){
+        nextQState='q';
+      } else if(nextQState == 'q'){
+        nextQNum--;
+      }
+      if(nextQNum < 1){
+        nextQNum = 1;
+      }
+      $state.go('practice-work', {
+        "qnum": nextQNum,
+        "qstate": nextQState
+      })
+    }
+
+    $scope.practice = function($event) {
+      var chaps = [];
+      
+      for(var i=0;i<$scope.selected.bible.length; i++){
+        if($scope.selected.bible[i]){
+          chaps.push($scope.chapters[i].number);
+          //console.log("selected chapter: "+chaps[chaps.length-1]);
+          
+        }
+      }
+      
+      if(chaps.length > 0){
+        var qPromise = PbeService.getQuestions(chaps).$promise;
+        qPromise.then(function(questions){
+          //console.log(JSON.stringify(questions));
+          
+          var numQs = questions.chapterQuestions + questions.commentaryQuestions;
+          var combinedQuestions = [];
+          
+          for(var i=0; i<questions.chapters.length;i++){
+            for(var j=0; j<questions.chapters[i].questions.length; j++){
+              combinedQuestions.push(questions.chapters[i].questions[j]);
+            }
+          }
+          
+          PbeService.setPracticeQuestions(combinedQuestions);
+          $state.go('practice-work', {"qnum": 1, "qstate": "q"});
+        });
+
+      }
+    }
+
   });
+
 
 
 })();

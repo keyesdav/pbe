@@ -1,0 +1,15 @@
+<div layout="column" style="height:100%">
+    <!--<md-whiteframe layout="column" layout-align="start start" layout-padding class="md-whiteframe-1dp">-->
+    <md-content flex layout="column" layout-align="start start">
+        <div>For {{practiceQuestions[qNum-1].points}} point<span ng-if="practiceQuestions[qNum-1].points > 1">s</span>, according to Exodus {{practiceQuestions[qNum-1].verse}},</div>
+        <div>{{practiceQuestions[qNum-1].question}}</div>
+        <div ng-if="qState=='a'">Answer: {{practiceQuestions[qNum-1].answer}}</div>
+    </md-content>
+    <div style="min-height:100px"></div>
+</div>
+    <div class="pbe-actions-fixed" layout="row" layout-align="end center">
+        <md-button class="md-raised" ng-click="done()"> Done </md-button>
+        <div style="width:50px"></div>
+        <md-button class="md-raised" ng-click="prev()"> Previous </md-button>
+        <md-button class="md-raised md-primary" ng-click="next()"> Next </md-button>
+    </div>
