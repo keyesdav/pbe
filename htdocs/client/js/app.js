@@ -232,6 +232,12 @@
     }
     
     $scope.report = function(testId) {
+      // PbeService.setSelectedTestId(testId);
+      
+      // $state.go('report', {
+      //   "testId": testId
+      // });
+      window.open("/slides/report.html?id=" + testId, "_blank");
     }
 
     $scope.scoreTest = function(testId) {
@@ -945,7 +951,16 @@
             }
           }
           
-          PbeService.setPracticeQuestions(combinedQuestions);
+          var randomizedQs = [];
+      	  var localRng = new Math.seedrandom('pbe');
+          while(combinedQuestions.length > 0){
+  					var i = Math.floor(localRng() * combinedQuestions.length);
+  					var randQ = combinedQuestions[i];
+  					combinedQuestions.splice(i,1);
+  					randomizedQs.push(randQ);
+          }
+          
+          PbeService.setPracticeQuestions(randomizedQs);
           $state.go('practice-work', {"qnum": 1, "qstate": "q"});
         });
 
