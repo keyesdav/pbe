@@ -179,3 +179,30 @@
     padding: 5px;
     margin: 10px 0px 20px 0px;
 }
+
+.practice-intro {
+    font-size: 26px;
+    /*background-color: #ffffaa;*/
+    margin-top: 15px;
+    margin-left: 15px;
+    margin-right: 15px;
+    color: #aaaaaa;
+}
+
+.practice-question {
+    font-size: 36px;
+    margin-top: 15px;
+    margin-left: 15px;
+    margin-right: 15px;
+    color: #000000;
+}
+
+.practice-answer {
+    font-size: 26px;
+    margin-top: 15px;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-bottom: 15px;
+    color: #aaaaaa;
+
+}

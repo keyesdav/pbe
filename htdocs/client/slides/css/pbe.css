@@ -37,8 +37,8 @@
 }
 
 .q-intro {
-    font-size: 25px!important;
-    color: rgba(255,255,255, .5);
+    font-size: 40px!important;
+    color: rgba(255,255,255, .8);
 }
 .q-answer {
     font-size: 40px!important;
@@ -46,7 +46,7 @@
 
 .q-text-dim {
     font-size: 40px!important;
-    color: rgba(255,255,255, .5);
+    color: rgba(255,255,255, .8);
 }
 
 .q-text {
@@ -58,7 +58,7 @@
 }
 
 .q-text-bible-verse-number {
-    color: rgba(255,255,255, .5);
+    color: rgba(255,255,255, .8);
 }
 
 .btn {

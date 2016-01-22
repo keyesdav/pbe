@@ -139,6 +139,8 @@
     }
 
     $scope.practiceQuestions = function($event){
+      $mdSidenav('left').toggle();
+
       $state.go('practice-select', {
       });
 
