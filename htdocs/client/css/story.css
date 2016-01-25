@@ -182,11 +182,12 @@
 
 .practice-intro {
     font-size: 26px;
-    /*background-color: #ffffaa;*/
+    background-color: #dddddd;
+    padding: 5px;
     margin-top: 15px;
     margin-left: 15px;
     margin-right: 15px;
-    color: #aaaaaa;
+    color: #4444ff;
 }
 
 .practice-question {
@@ -199,6 +200,18 @@
 
 .practice-answer {
     font-size: 26px;
+    padding: 5px;
+    margin-top: 15px;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-bottom: 15px;
+    background: #4444ff;
+    color: #ffffff;
+
+}
+
+.practice-bible {
+    font-size: 20px;
     margin-top: 15px;
     margin-left: 15px;
     margin-right: 15px;

@@ -42,7 +42,7 @@
 
   }]);
 
-  app.controller('MainAppController', ['$scope', '$state', '$mdBottomSheet', '$mdSidenav', '$mdDialog', '$mdComponentRegistry', 'PbeTests', function($scope, $state, $mdBottomSheet, $mdSidenav, $mdDialog, $mdComponentRegistry, PbeTests) {
+  app.controller('MainAppController', ['$scope', '$state', '$mdBottomSheet', '$mdSidenav', '$mdDialog', '$mdComponentRegistry', 'PbeTests', 'PbeService', function($scope, $state, $mdBottomSheet, $mdSidenav, $mdDialog, $mdComponentRegistry, PbeTests, PbeService) {
 
     $scope.activity = "";
 
@@ -149,6 +149,10 @@
     $scope.practiceProgress = function($event){
       $mdSidenav('left').toggle();
       $state.go('practice-progress');
+    }
+    
+    $scope.flushCaches = function($event){
+      PbeService.flushCaches();
     }
 
   }]);
@@ -885,6 +889,20 @@
         $scope.selected.bible = new Array($scope.chapters.length);
         $scope.selected.commentary = new Array($scope.commentary.length);
       });
+
+    if($scope.qState && $scope.qState == 'a'){
+    		// 	var reqPromise = $.ajax("/api/bible/Exodus?verses=" + question.verse).done(function(bibleData) {
+    		// 		question.bibleData = bibleData;
+    		// 	});
+
+     var versePromise = PbeService.getBibleData("Exodus", $scope.practiceQuestions[$scope.qNum-1].verse).$promise;
+     versePromise
+      .then(function(verses) {
+        console.log("done loading verses...");
+        $scope.practiceQuestions[$scope.qNum-1].bibleData = verses;
+      });
+     
+    }
 
 
     $scope.cancel = function($event) {

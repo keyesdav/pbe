@@ -80,6 +80,8 @@ app.delete('/api/pbe/tests/:testId', handleDeletePbeTest);
 app.delete('/api/pbe/cache', handleDeleteCache);
 app.post('/api/pbe/score/:testId', handlePostScore);
 app.get('/api/pbe/score/:testId', handleGetScore);
+app.post('/api/pbe/practice/results/:book/:questionId/:practiceId', handleAddPracticeRecord);
+app.get('/api/pbe/practice/results/:book', handleGetPracticeRecords);
 
 
 /////////////////////////
@@ -554,7 +556,7 @@ function handleDeletePbeTest(req, rsp){
 
 function handleDeleteCache(req, rsp){
   
-  ttlCache.delete('questions');
+  ttlCache.flushAll();
 }
 
 
@@ -587,5 +589,13 @@ function handleGetScore(req, rsp){
   else {
     rsp.json(score);
   }
+  
+}
+
+function handleAddPracticeRecord(req, rsp){
+  
+}
+
+function handleGetPracticeRecords(req, rsp){
   
 }

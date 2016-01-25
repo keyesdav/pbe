@@ -38,6 +38,7 @@
         
         
         var questionResource = null;
+        var bibleResource = null;
         var Test = null;
         var Score = null;
         var selectedTestId = null;
@@ -92,7 +93,35 @@
               return chapRes.get({"book": b});
           },
           
+          getBibleData: function(book, verseSpec){
+            if(bibleResource == null || typeof chaps != 'undefined'){
+              bibleResource = $resource('/api/bible/:book', {book:'@book'}, {
+                'get': { method:'GET', cache: true },
+              });
+            }
+            
+            
+            var reqParams = { "book": book };
+            if(typeof verseSpec != 'undefined'){
+              reqParams.verses=verseSpec;
+            }
+            
+            return bibleResource.get(reqParams);
+          },
           
+          flushCaches: function(){
+            var cacheFlushResource =$resource('/api/pbe/cache', {book:'@book'}, {
+                'delete': { method:'DELETE', cache: false },
+            });
+            
+            var cache = $cacheFactory.get("$http");
+            cache.remove("/api/pbe/tests");
+            cache.remove("/api/pbe/questions");
+
+          
+            return cacheFlushResource.delete();
+          },
+
           getTests: function() {
             if(Test == null){
               Test = this.createTest();

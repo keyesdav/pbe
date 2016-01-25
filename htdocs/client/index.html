@@ -98,11 +98,14 @@
           <span>PBE Manager</span>
         </h2>
         <span flex></span>
+        <md-button class="md-icon-button" aria-label="Settings">
+          <md-icon class="material-icons" ng-click="flushCaches()">refresh</md-icon>
+        </md-button>
       </div>
     </md-toolbar>
     <!--<md-content flex>-->
       <div flex layout-fill>
-        <div layout-fill ui-view></div>
+        <div layout-fill ui-view ></div>
       </div>
     <!--</md-content>-->
   </div>
