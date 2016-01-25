@@ -4,7 +4,10 @@
   cursor: pointer;
   margin-right: 6px; }
 
-
+.no-animate {
+   -webkit-transition: none !important;
+   transition: none !important;
+}
 
 .navEntry {
   margin-top: 0px;
