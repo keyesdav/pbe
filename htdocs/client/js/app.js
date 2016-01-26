@@ -341,7 +341,7 @@
 
     $scope.editTest = function(testId) {
 
-      if(! AuthService.isAuthenticated()  && $scope.testMap[testId].Locked){
+      if(! AuthService.isAuthenticated()  && typeof testId != 'undefined' && testId != null && $scope.testMap[testId].Locked){
         
         $scope.authenticateUser(function(){doEdit();});
         
