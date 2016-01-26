@@ -516,7 +516,8 @@ function handlePostCreateOrUpdatePbeTest(req, rsp){
          TestId: testId,
          Title: newTest.Title,
          SubTitle: newTest.SubTitle,
-         Questions: newTest.Questions
+         Questions: newTest.Questions,
+         Locked: newTest.Locked
       }
     };
     

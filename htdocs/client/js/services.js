@@ -32,6 +32,30 @@
         return Test;
       }]);
       
+
+    pbeServices.factory('AuthService', ['$resource', '$cacheFactory', '$mdDialog',
+      function($resource, $cacheFactory, $mdDialog){
+      
+        var authenticated = false;
+      
+        return {
+          
+          isAuthenticated: function(){
+            return authenticated;
+          },
+          
+          authenticate: function(uname, pw){
+            if(uname == "pbe" && pw =="critters123"){
+              authenticated = true;
+              return authenticated;
+            }
+            
+            return authenticated;
+          }
+          
+        }
+      }
+    ]);
       
     pbeServices.factory('PbeService', ['$resource', '$cacheFactory', 
       function($resource, $cacheFactory){
@@ -183,6 +207,7 @@
             saveRes.Title  = testToSave.Title;
             saveRes.SubTitle = testToSave.SubTitle;
             saveRes.Questions = testToSave.Questions;
+            saveRes.Locked = typeof testToSave.Locked != 'undefined'?testToSave.Locked:false;
 
             return saveRes.$save();
           },

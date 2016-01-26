@@ -197,13 +197,33 @@
 
 
 
+  app.controller("LoginController", function($scope, $state, $mdDialog, AuthService){
+    $scope.username="";
+    $scope.password="";
+    
+    $scope.login = function(username, password){
+      var credentials = {"username": username, "password": password};
+      $mdDialog.hide(credentials);
+    }
+    
+    $scope.cancel = function(){
+      $mdDialog.cancel();
+      
+    }
+  });
 
-  app.controller("TestController", function($scope, $state, $mdDialog, PbeService) {
+
+  app.controller("TestController", function($scope, $state, $mdDialog, $mdMedia, PbeService, AuthService) {
 
     $scope.$parent.selectedTestId = "";
+    $scope.testMap = {};
+
 
     $scope.tests = PbeService.getTests().$promise.then(function(tests) {
       $scope.tests = tests;
+      for(var i=0; i<tests.length; i++){
+        $scope.testMap[tests[i].TestId] = tests[i];
+      }
     });
 
     $scope.getStoryCount = function() {
@@ -232,86 +252,161 @@
       }
 
     }
+    
+    $scope.authenticateUser = function(fn){
+        // var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
+
+        $mdDialog.show({
+          controller: "LoginController",
+          templateUrl: 'partials/login.html',
+          // parent: angular.element(document.body),
+          // targetEvent: ev,
+          clickOutsideToClose:false,
+          fullscreen: false
+        })
+        .then(function(credentials) {
+          // $scope.status = 'You said the information was "' + answer + '".';
+          //console.log("User name: "+credentials.username+", password:"+credentials.password);
+          var authenticated = AuthService.authenticate(credentials.username, credentials.password);
+          if(authenticated){
+            fn();
+          } else {
+            
+            var alert = $mdDialog.alert({
+              title: 'Authentication Failure!',
+              textContent: "Incorrect username or password.",
+              ok: 'Close'
+            });
+            $mdDialog.show(alert);
+            
+
+          }
+        }, function() {
+          console.log('You cancelled the login.');
+        });
+    }
 
     $scope.presentTest = function(testId) {
-      window.open("/slides?id=" + testId, "_blank");
+      
+      if(! AuthService.isAuthenticated() && $scope.testMap[testId].Locked){
+        
+        $scope.authenticateUser(function(){window.open("/slides?id=" + testId, "_blank");});
+        
+      } else {
+      
+        window.open("/slides?id=" + testId, "_blank");
+        
+      }
     }
     
     $scope.report = function(testId) {
-      // PbeService.setSelectedTestId(testId);
-      
-      // $state.go('report', {
-      //   "testId": testId
-      // });
-      window.open("/slides/report.html?id=" + testId, "_blank");
+      if(! AuthService.isAuthenticated() && $scope.testMap[testId].Locked){
+        
+        $scope.authenticateUser(function(){window.open("/slides/report.html?id=" + testId, "_blank");});
+        
+      } else {
+        window.open("/slides/report.html?id=" + testId, "_blank");
+      }
     }
 
     $scope.scoreTest = function(testId) {
 
-      PbeService.setSelectedTestId(testId);
-
-      for (var i = 0; i < $scope.tests.length; i++) {
-        if ($scope.tests[i].TestId == testId) {
-          PbeService.setSelectedTest($scope.tests[i]);
-          break;
-        }
+      if(! AuthService.isAuthenticated()  && $scope.testMap[testId].Locked){
+        
+        $scope.authenticateUser(function(){doScore();});
+        
+      } else {
+        doScore();
       }
 
-      $state.go('test-score', {
-        "testId": testId
-      });
-      // $state.go('test-edit');
 
-    }
+      function doScore(){
 
-
-    $scope.editTest = function(testId) {
-
-      if (typeof testId === 'undefined' || testId == "") {
-        $state.go('test-edit', {
-          "testId": testId
-        });
-        // $state.go('test-edit');
-      }
-      else {
         PbeService.setSelectedTestId(testId);
-
+  
         for (var i = 0; i < $scope.tests.length; i++) {
           if ($scope.tests[i].TestId == testId) {
             PbeService.setSelectedTest($scope.tests[i]);
             break;
           }
         }
-
-        $state.go('test-edit', {
+  
+        $state.go('test-score', {
           "testId": testId
         });
         // $state.go('test-edit');
-
       }
+    }
+
+
+    $scope.editTest = function(testId) {
+
+      if(! AuthService.isAuthenticated()  && $scope.testMap[testId].Locked){
+        
+        $scope.authenticateUser(function(){doEdit();});
+        
+      } else {
+        doEdit();
+      }
+
+      function doEdit() {
+        if (typeof testId === 'undefined' || testId == "") {
+          $state.go('test-edit', {
+            "testId": testId
+          });
+          // $state.go('test-edit');
+        }
+        else {
+          PbeService.setSelectedTestId(testId);
+  
+          for (var i = 0; i < $scope.tests.length; i++) {
+            if ($scope.tests[i].TestId == testId) {
+              PbeService.setSelectedTest($scope.tests[i]);
+              break;
+            }
+          }
+  
+          $state.go('test-edit', {
+            "testId": testId
+          });
+          // $state.go('test-edit');
+  
+        }
+      }
+      
+      
     }
 
     $scope.deleteTest = function(testId, evt) {
       
-      var confirm = $mdDialog.confirm()
-        .title('Delete Test?')
-        .content('Are you sure that you want to delete this test?')
-        .targetEvent(evt)
-        .ok('OK')
-        .cancel('Cancel');
-      $mdDialog.show(confirm).then(function() {
-
-        PbeService.deleteTest(testId);
-        PbeService.invalidateTestList();
-        $state.go($state.current, {}, {
-          reload: true
-        });
+      if(! AuthService.isAuthenticated()  && $scope.testMap[testId].Locked){
         
-      }, function() {
-
-        // DOH!  No error handling cause I'm lazy...
-      });
-
+        $scope.authenticateUser(function(){doDelete();});
+        
+      } else {
+        doDelete();
+      }
+      
+      function doDelete() {
+        var confirm = $mdDialog.confirm()
+          .title('Delete Test?')
+          .content('Are you sure that you want to delete this test?')
+          .targetEvent(evt)
+          .ok('OK')
+          .cancel('Cancel');
+        $mdDialog.show(confirm).then(function() {
+  
+          PbeService.deleteTest(testId);
+          PbeService.invalidateTestList();
+          $state.go($state.current, {}, {
+            reload: true
+          });
+          
+        }, function() {
+  
+          // DOH!  No error handling cause I'm lazy...
+        });
+      }
     }
 
 
@@ -342,6 +437,7 @@
       $scope.myTest.Title = "...";
       $scope.myTest.SubTitle = "...";
       $scope.myTest.Questions = [];
+      $scope.myTest.Locked = false;
 
       $scope.chapters = [];
       $scope.commentary = [];
@@ -439,6 +535,7 @@
       $scope.myTest.Title = "";
       $scope.myTest.SubTitle = "";
       $scope.myTest.Questions = [];
+      $scope.myTest.Locked=false;
 
 
       $timeout(function() {

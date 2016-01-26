@@ -1,0 +1,27 @@
+<md-dialog style="min-width: 300px;" aria-label="Login"  ng-cloak layout="column">
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Login</h2>
+        <span flex></span>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <form>
+        <md-input-container style="margin-top: 30px; margin-left:30px; margin-right:30px">
+            <label>User Name</label>
+            <input md-autofocus ng-model="username">
+        </md-input-container>
+        <md-input-container style="margin-bottom: 10px; margin-left:30px; margin-right:30px">
+            <label>Password</label>
+            <input ng-model="password" type="password">
+        </md-input-container>
+        <div layout="row" style="margin-bottom: 10px">
+          <span flex></span>
+          <md-button type="button" class="md-raised" ng-click="cancel()">Cancel</md-button>
+          <md-button type="submit" class="md-raised md-primary" ng-click="login(username, password)" style="margin-right:20px;">Login</md-button>
+        </div>
+      </form>
+    </md-dialog-content>
+    <!--<md-dialog-actions layout="row">-->
+    <!--</md-dialog-actions>-->
+</md-dialog>

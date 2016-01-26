@@ -4,7 +4,7 @@
     <md-list layout-margin>
       <md-list-item class="md-3-line" ng-repeat="s in tests" style="position: relative!important">
         <div class="md-list-item-text">
-          <h3></h3><b><a href ng-click="editTest(s.TestId)">{{s.Title}}</a></b></h3>
+          <md-icon ng-if="s.Locked" style="margin-right:5px" class="material-icons" ng-click="flushCaches()">lock_outline</md-icon><b><a href ng-click="editTest(s.TestId)">{{s.Title}}</a></b>
           <h4>{{s.SubTitle}}</h4>
           <p>{{s.Questions.length}} Questions</p>
         </div>
@@ -41,7 +41,7 @@
       </md-list-item>
     </md-list>
     </md-whiteframe>
-
+    <div style="min-height:100px"></div>
 </md-content>
 
 <md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="editTest()">

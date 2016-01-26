@@ -3,10 +3,13 @@
     <div flex="none" style="width: 100%; height: 140px">
         <form style="width: 100%" name="userForm">
             <div flex layout="column" layout-align="start start">
-                <md-input-container style="width: 100%">
-                    <label>Test Title</label>
-                    <input type="string" ng-model="myTest.Title" />
-                </md-input-container>
+                <div layout="row" style="width:100%">
+                    <md-input-container style="width: 100%">
+                        <label>Test Title</label>
+                        <input type="string" ng-model="myTest.Title" />
+                    </md-input-container>
+                    <md-switch ng-model="myTest.Locked">Locked</md-switch>
+                </div>
                 <md-input-container style="width: 100%">
                     <label>Test Subtitle</label>
                     <input type="string" ng-model="myTest.SubTitle" />

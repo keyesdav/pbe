@@ -4,7 +4,8 @@
     <md-slider class="no-animate" ng-model="qNum" min="1" step="1" max="{{practiceQuestions.length}}"></md-slider>
     <md-content flex layout="column" layout-align="start start">
         <div ng-if="qState=='a' || qState=='q'">
-            <div class="practice-intro">#{{qNum}}: For {{practiceQuestions[qNum-1].points}} point<span ng-if="practiceQuestions[qNum-1].points > 1">s</span>, according to Exodus {{practiceQuestions[qNum-1].verse}}:</div>
+            <div ng-if="qState=='q'" class="practice-intro">#{{qNum}}: For {{practiceQuestions[qNum-1].points}} point<span ng-if="practiceQuestions[qNum-1].points > 1">s</span>, according to Exodus {{practiceQuestions[qNum-1].verse}}:</div>
+            <div ng-if="qState=='a'" class="practice-intro">#{{qNum}}: Score: <md-button class="md-raised md-primary practice-score" ng-click="score()">{{practiceQuestions[qNum-1].points}}</md-button> of {{practiceQuestions[qNum-1].points}} possible point<span ng-if="practiceQuestions[qNum-1].points > 1">s</span></div>
             <div class="practice-question">{{practiceQuestions[qNum-1].question}}</div>
             <div ng-if="qState=='a'">
                 <div class="practice-answer">{{practiceQuestions[qNum-1].answer}}</div>
@@ -36,8 +37,6 @@
 </div>
     <div class="pbe-actions-fixed" layout="row" layout-align="end center">
         <md-button class="md-raised" ng-click="done()"> Done </md-button>
-        <div style="width:50px"></div>
-        <md-button class="md-raised" ng-click="score()"> {{practiceQuestions[qNum-1].points}} </md-button>
         <div style="width:50px"></div>
         <md-button class="md-raised" ng-click="prev()"> < </md-button>
         <md-button class="md-raised md-primary" ng-click="next()"> > </md-button>

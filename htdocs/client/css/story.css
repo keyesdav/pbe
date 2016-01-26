@@ -222,3 +222,11 @@
     color: #aaaaaa;
 
 }
+
+.practice-score {
+    font-size: 24px;
+    line-height: 18px !important;
+    /* max-height: 18px; */
+    margin: 0px;
+    min-height: 30px;
+}
