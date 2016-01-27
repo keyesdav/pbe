@@ -1,4 +1,4 @@
-<div layout="column" class="" style="height:100%; margin: 10px" md-swipe-left="next()" md-swipe-right="prev()">
+<div layout="column" class="" style="height:100%; margin: 10px" md-swipe-left="next()" md-swipe-right="prev()" ng-keydown="keypressNextPrev($event)">
 <!--<md-whiteframe class="md-whiteframe-4dp" layout="column" style="height: 50%; margin-left: 30px; margin-right: 30px; margin-top: 30px; margin-bottom: 90px; padding: 10px">-->
     <!--<md-whiteframe layout="column" layout-align="start start" layout-padding class="md-whiteframe-1dp">-->
     <md-slider class="no-animate" ng-model="qNum" min="1" step="1" max="{{practiceQuestions.length}}"></md-slider>

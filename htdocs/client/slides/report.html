@@ -78,9 +78,67 @@
 			// after all of the bible verses have been loaded from the bible API, then generate slides...
 			$.when.apply($, bibleDeferreds).then(function() {
 
+				// var qNum = 0;
+				// while (testQs.length > 0) {
+				// 	qNum++;
+				// 	var i = 0;
+				// 	if (order == "random") {
+				// 		i = Math.floor(localRng() * testQs.length);
+				// 	}
+				// 	var q = testQs[i];
+				// 	testQs.splice(i, 1);
+				// 	addSlidesForQuestion(qNum, q);
+				// }
+
+				var insertRealTestSlides = false;
+				var endOfFirstHalfQuestion = null;
+				var endOfSecondHalfQuestion = null;
+				if(testQs.length == 90){
+					insertRealTestSlides = true;
+					
+					// loop through and find the two biggest slides for the end of the halves
+					var i=0;
+					var biggestScore=0;
+					var biggestScoreId=-1;
+					var secondBiggestScore=0;
+					var secondBiggestScoreId=-1;
+					while(i < testQs.length){
+						if(testQs[i].points > biggestScore){
+							biggestScore = testQs[i].points;
+							biggestScoreId=i;
+						}
+						
+						else if(testQs[i].points > secondBiggestScore){
+							secondBiggestScore = testQs[i].points;
+							secondBiggestScoreId=i;
+						}
+						
+						i++;
+					}
+					
+					endOfFirstHalfQuestion = testQs[secondBiggestScoreId];
+					endOfSecondHalfQuestion = testQs[biggestScoreId];
+					if(secondBiggestScoreId > biggestScoreId){
+						testQs.splice(secondBiggestScoreId,1);
+						testQs.splice(biggestScoreId, 1);
+					} else {
+						testQs.splice(biggestScoreId, 1);
+						testQs.splice(secondBiggestScoreId,1);
+					}
+				}
+
 				var qNum = 0;
 				while (testQs.length > 0) {
 					qNum++;
+					
+					if(insertRealTestSlides){
+						if(qNum == 45){
+							addSlidesForQuestion(qNum, endOfFirstHalfQuestion);
+							continue;
+						}
+						
+					}
+					
 					var i = 0;
 					if (order == "random") {
 						i = Math.floor(localRng() * testQs.length);
@@ -88,14 +146,18 @@
 					var q = testQs[i];
 					testQs.splice(i, 1);
 					addSlidesForQuestion(qNum, q);
+
+					if(insertRealTestSlides){
+
+						if(qNum == 89){
+							addSlidesForQuestion(90, endOfSecondHalfQuestion);
+							continue;
+						}
+					}
+
+
 				}
 				
-
-				setTimeout(function() {
-					Reveal.next();
-					Reveal.remove(0);
-				}, 500);
-
 			});
 
 

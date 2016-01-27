@@ -854,11 +854,72 @@
           // randomly organize the questions (in the same order that's used in the test presentation)
   	    	var localRng = new Math.seedrandom('pbe');
   	    	var randQs = [];
+  	    	
+  	    	
+					var insertRealTestSlides = false;
+  				var endOfFirstHalfQuestion = null;
+  				var endOfSecondHalfQuestion = null;
+  				if($scope.score.questions.length == 90){
+  					insertRealTestSlides = true;
+  					
+  					// loop through and find the two biggest slides for the end of the halves
+  					var i=0;
+  					var biggestScore=0;
+  					var biggestScoreId=-1;
+  					var secondBiggestScore=0;
+  					var secondBiggestScoreId=-1;
+  					while(i < $scope.score.questions.length){
+  						if($scope.score.questions[i].points > biggestScore){
+  							biggestScore = $scope.score.questions[i].points;
+  							biggestScoreId=i;
+  						}
+  						
+  						else if($scope.score.questions[i].points > secondBiggestScore){
+  							secondBiggestScore = $scope.score.questions[i].points;
+  							secondBiggestScoreId=i;
+  						}
+  						
+  						i++;
+  					}
+  					
+  					endOfFirstHalfQuestion = $scope.score.questions[secondBiggestScoreId];
+  					endOfSecondHalfQuestion = $scope.score.questions[biggestScoreId];
+  					if(secondBiggestScoreId > biggestScoreId){
+  						$scope.score.questions.splice(secondBiggestScoreId,1);
+  						$scope.score.questions.splice(biggestScoreId, 1);
+  					} else {
+  						$scope.score.questions.splice(biggestScoreId, 1);
+  						$scope.score.questions.splice(secondBiggestScoreId,1);
+  					}
+  				}
+
+  	    	
+  	    	
+  	    	var qNum=0;
   				while ($scope.score.questions.length > 0) {
+  				  qNum ++;
+  				  
+  					if(insertRealTestSlides){
+  						if(qNum == 45){
+  							randQs.push(endOfFirstHalfQuestion);
+  							continue;
+  						}
+  						
+  					}
+
   					var i = Math.floor(localRng() * $scope.score.questions.length);
   					var q = $scope.score.questions[i];
   					$scope.score.questions.splice(i, 1);
   					randQs.push(q);
+  					
+						if(insertRealTestSlides){
+
+  						if(qNum == 89){
+  							randQs.push(endOfSecondHalfQuestion);
+  							continue;
+  						}
+  					}
+
           }
           $scope.score.questions = randQs;
   
@@ -969,6 +1030,16 @@
 
     $scope.practiceQuestions=PbeService.getPracticeQuestions();
     
+    if(typeof $scope.qState != 'undefined'){
+      $(document).unbind('keydown.practice');
+      $(document).bind('keydown.practice', function(e) {
+        if(e.which == 39){
+          $scope.next();
+        } else {
+          $scope.prev();
+        }
+      });
+    }    
     
     // graph
     $scope.labels = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40"];
@@ -1006,6 +1077,11 @@
     $scope.cancel = function($event) {
       $state.go('tests');
     };
+    
+    
+    $scope.keypressNextPrev = function(ev){
+      console.log("key pressed:"+ev.which);
+    }
     
     $scope.next = function($event) {
       var nextQNum = $scope.qNum;

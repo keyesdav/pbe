@@ -429,9 +429,56 @@
 			// after all of the bible verses have been loaded from the bible API, then generate slides...
 			$.when.apply($, bibleDeferreds).then(function() {
 
+				var insertRealTestSlides = false;
+				var endOfFirstHalfQuestion = null;
+				var endOfSecondHalfQuestion = null;
+				if(testQs.length == 90){
+					insertRealTestSlides = true;
+					
+					// loop through and find the two biggest slides for the end of the halves
+					var i=0;
+					var biggestScore=0;
+					var biggestScoreId=-1;
+					var secondBiggestScore=0;
+					var secondBiggestScoreId=-1;
+					while(i < testQs.length){
+						if(testQs[i].points > biggestScore){
+							biggestScore = testQs[i].points;
+							biggestScoreId=i;
+						}
+						
+						else if(testQs[i].points > secondBiggestScore){
+							secondBiggestScore = testQs[i].points;
+							secondBiggestScoreId=i;
+						}
+						
+						i++;
+					}
+					
+					endOfFirstHalfQuestion = testQs[secondBiggestScoreId];
+					endOfSecondHalfQuestion = testQs[biggestScoreId];
+					if(secondBiggestScoreId > biggestScoreId){
+						testQs.splice(secondBiggestScoreId,1);
+						testQs.splice(biggestScoreId, 1);
+					} else {
+						testQs.splice(biggestScoreId, 1);
+						testQs.splice(secondBiggestScoreId,1);
+					}
+				}
+
 				var qNum = 0;
 				while (testQs.length > 0) {
 					qNum++;
+					
+					if(insertRealTestSlides){
+						if(qNum == 45){
+							addSlidesForQuestion(qNum, endOfFirstHalfQuestion);
+							addIntermissionSlide();
+							continue;
+						}
+						
+					}
+					
 					var i = 0;
 					if (order == "random") {
 						i = Math.floor(localRng() * testQs.length);
@@ -439,6 +486,16 @@
 					var q = testQs[i];
 					testQs.splice(i, 1);
 					addSlidesForQuestion(qNum, q);
+
+					if(insertRealTestSlides){
+
+						if(qNum == 89){
+							addSlidesForQuestion(90, endOfSecondHalfQuestion);
+							continue;
+						}
+					}
+
+
 				}
 				
 				addScoreSlide(test);
@@ -479,6 +536,16 @@
 
 			// $("#pbe_title").attr("data-transition", "convex-in fade-out");
 
+		}
+		
+		function addIntermissionSlide() {
+			var slide1 = "<img class='pbelogo' src='./img/pbe-logo.png'/><div class='pbetitle'>" +
+				"<h1>PBE Quiz</h1></div>" +
+				"<div class='pbecontent'>" +
+				"<p class='q-text'><h2>Intermission</h2></p>" +
+				"<p class='q-text'>Enjoy your ten minute break!</p><br/>" +
+				"</div>";
+			Reveal.add(slide1, null, "intermission");
 		}
 		
 		function addScoreSlide(test){
