@@ -5,7 +5,7 @@
     <md-content flex layout="column" layout-align="start start">
         <div ng-if="qState=='a' || qState=='q'">
             <div ng-if="qState=='q'" class="practice-intro">#{{qNum}}: For {{practiceQuestions[qNum-1].points}} point<span ng-if="practiceQuestions[qNum-1].points > 1">s</span>, according to Exodus {{practiceQuestions[qNum-1].verse}}:</div>
-            <div ng-if="qState=='a'" class="practice-intro">#{{qNum}}: Score: <md-button class="md-raised md-primary practice-score" ng-click="score()">{{practiceQuestions[qNum-1].points}}</md-button> of {{practiceQuestions[qNum-1].points}} possible point<span ng-if="practiceQuestions[qNum-1].points > 1">s</span></div>
+            <div ng-if="qState=='a'" class="practice-intro">#{{qNum}}: Score: <md-button class="md-raised md-primary practice-score" ng-click="rotateScore()">{{score}}</md-button> of {{practiceQuestions[qNum-1].points}} possible point<span ng-if="practiceQuestions[qNum-1].points > 1">s</span></div>
             <div class="practice-question">{{practiceQuestions[qNum-1].question}}</div>
             <div ng-if="qState=='a'">
                 <div class="practice-answer">{{practiceQuestions[qNum-1].answer}}</div>

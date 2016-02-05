@@ -13,7 +13,7 @@ var uuid     = require('uuid');
 var bodyParser = require('body-parser');
 var NodeCache = require( "node-cache" );
 
-var scoreCache = new NodeCache( { stdTTL: (60*5), checkperiod: 60});
+var scoreCache = new NodeCache( { stdTTL: (0), checkperiod: 0});  // seconds
 
 var ttlCache = new NodeCache( { stdTTL: 600, checkperiod: 60 } );  // cache this for eight hours
 
@@ -71,6 +71,7 @@ app.use(bodyParser.json({ limit: '50mb'}))
 // app.delete('/api/story/:publisherid/:storyid', handleDeleteStory);
 app.get('/api/bible/:book', handleGetBibleVerses);
 app.get('/api/pbe/questions/:book', handleGetPbeQuestions);
+app.get('/api/pbe/questions/:book/errors', handleGetPbeQuestionErrors)
 app.get('/api/pbe/questions/:book/chapters', handleGetPbeQuestionChapters);
 app.get('/api/pbe/tests', handleGetPbeTests);
 app.get('/api/pbe/tests/:testId', handleGetPbeTest);
@@ -80,8 +81,8 @@ app.delete('/api/pbe/tests/:testId', handleDeletePbeTest);
 app.delete('/api/pbe/cache', handleDeleteCache);
 app.post('/api/pbe/score/:testId', handlePostScore);
 app.get('/api/pbe/score/:testId', handleGetScore);
-app.post('/api/pbe/practice/results/:book/:questionId/:practiceId', handleAddPracticeRecord);
-app.get('/api/pbe/practice/results/:book', handleGetPracticeRecords);
+app.post('/api/pbe/practice/results/:book/:questionId', handleAddPracticeRecord);
+app.get('/api/pbe/practice/results/:primaryLocation', handleGetPracticeRecords);
 
 
 /////////////////////////
@@ -264,6 +265,54 @@ function parseVerses(book, verseSpec){
   
   return ret;
 }
+
+function handleGetPbeQuestionErrors(req, rsp){
+  
+  var chapters = req.query.chapter;
+  if(typeof chapters == 'undefined'){
+    chapters = [];
+  } else if(typeof chapters == 'string') {
+    chapters = [chapters];
+  }
+
+  var commentary = req.query.commentary;
+  if(typeof commentary == 'undefined'){
+    commentary = [];
+  } else if(typeof commentary == 'string') {
+    commentary = [commentary];
+  }
+
+
+  var questions = ttlCache.get("questions");
+  
+  var errors = [];
+
+  for(var i=0; i<questions.chapters.length; i++){
+    
+    var chapter = questions.chapters[i];
+    for(var j=0; j<chapter.questions.length; j++){
+      var q = chapter.questions[j];
+      
+      if( typeof q.id == 'undefined' || q.id == '' ||
+        typeof q.src == 'undefined' || q.src == '' ||
+        
+        typeof q.points == 'undefined' || q.points == '' ||
+        typeof q.verse == 'undefined' || q.verse == '' ||
+        typeof q.question == 'undefined' || q.question == '' ||
+        typeof q.answer == 'undefined' || q.answer == '' 
+      
+      
+      ){
+        q.location = "chapter:"+chapter.number+", question="+j;
+        errors.push(q);
+      }
+    }
+  }
+
+
+  rsp.json(errors);
+}
+
 
 function handleGetPbeQuestions(req, rsp){
   
@@ -594,6 +643,58 @@ function handleGetScore(req, rsp){
 }
 
 function handleAddPracticeRecord(req, rsp){
+  
+  console.log("practice posted: "+JSON.stringify(req.body));
+  //rsp.json({response: "ok"});
+  
+  // --------
+  
+  var newRecord = req.body;
+
+  var docClient = new aws.DynamoDB.DocumentClient();
+  
+  // first, try to get the testId from the URL
+  var qId = req.params.questionId;
+  var myId;
+  
+  // next check for an id in the test object passed in...
+  if(typeof newRecord.id != 'undefined' && newRecord.id !== ""){
+    myId = newRecord.id;
+  }
+
+  // finally, if we can't find a UUID anywhere that we've looked, then create a new one
+  if(typeof myId == 'undefined'){
+    myId = uuid.v1();
+  }
+  
+
+    var params = {
+      TableName: 'PBE_Practice',
+      Item: {
+         id: myId,
+         questionId: qId,
+         passed: newRecord.passed,
+         percent: newRecord.percent,
+         points: newRecord.points,
+         possible: newRecord.possible,
+         primaryLocation: newRecord.primaryLocation,
+         secondaryLocation: newRecord.secondaryLocation,
+         tertiaryLocation: newRecord.tertiaryLocation,
+         userId: ""+newRecord.userId,
+         teamId: ""+newRecord.teamId
+      }
+    };
+    
+    var docClient = new aws.DynamoDB.DocumentClient();
+    
+    docClient.put(params, function(err, data) {
+      if (err){
+        console.log(err);
+      } else {
+        rsp.json(data);
+      }
+    });
+
   
 }
 

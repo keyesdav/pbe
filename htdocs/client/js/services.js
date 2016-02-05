@@ -65,6 +65,7 @@
         var bibleResource = null;
         var Test = null;
         var Score = null;
+        var Practice = null;
         var selectedTestId = null;
         var selectedTest = null;
         var functions = null;
@@ -251,16 +252,20 @@
                 s.totalPoints = totalPoints;
                 s.scoredPoints = scoredPoints;
                 s.percentage = +((Math.round(scoredPoints/totalPoints*10000)/10000)*100).toFixed(2);
+                s.record = teams[i].tally;
                 scoreToPost.teams[i] = s;
               } else {
                 var s = {};
                 s.totalPoints = totalPoints;
                 s.scoredPoints = scoredPoints;
                 s.percentage = 0.0;
+                s.record = [];
                 scoreToPost.teams[i] = s;
                 
               }
             }
+            
+            scoreToPost.questions = questions;
             
             var p = scoreToPost.$save();
             p.then(function(){
@@ -280,7 +285,50 @@
           
           getPracticeQuestions: function(){
             return practiceQuestions;
+          },
+
+          createPracticeResource: function(){
+            var ret = $resource('/api/pbe/practice/results/:primaryLocation/:questionId', {primaryLocation:'@primaryLocation', questionId:'@questionId'}, {
+              'get': { method:'GET', cache: false },
+              'save':{ method:'POST', cache: false},
+            });
+
+            return ret;
+            
+          },
+
+          
+          postPractice: function(question, prRec){
+            
+            if(Practice == null){
+              Practice = this.createPracticeResource();
+            }
+            
+            var practiceRecord = new Practice();
+           
+            // fill in the practiceRecord
+            practiceRecord.passed = prRec.passed;
+            practiceRecord.percent = prRec.percent;
+            practiceRecord.points = prRec.points;
+            practiceRecord.possible = prRec.possible;
+
+            practiceRecord.primaryLocation = prRec.primaryLocation;
+            practiceRecord.secondaryLocation = prRec.secondaryLocation;
+            practiceRecord.tertiaryLocation = prRec.tertiaryLocation;
+            
+            practiceRecord.teamId = typeof prRec.teamId != 'undefined'?prRec.teamId:-1;
+            practiceRecord.userId = typeof prRec.userId != 'undefined'?prRec.userId:-1;
+            
+            
+            
+            var p=practiceRecord.$save({"primaryLocation": question.src, "questionId": question.id});
+            p.then(function (){
+              console.log("practiceRecord saved: "+practiceRecord.points+"/"+practiceRecord.possible);
+            }, function(){
+              console.log("practiceRecord NOT saved: "+practiceRecord.points+"/"+practiceRecord.possible);
+            });
           }
+
           
         };
         

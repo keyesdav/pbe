@@ -1029,6 +1029,8 @@
     $scope.qState = $stateParams.qstate;
 
     $scope.practiceQuestions=PbeService.getPracticeQuestions();
+    $scope.score = "---";
+    
     
     if(typeof $scope.qState != 'undefined'){
       $(document).unbind('keydown.practice');
@@ -1049,7 +1051,7 @@
     ];
 
 
-    var chapPromise = PbeService.getQuestionChapters("Exodus").$promise;
+    var chapPromise = PbeService.getQuestionChapters("Exodus").$promise  // this usually hits the cache...
     chapPromise
       .then(function(questChaps) {
         console.log("done loading question chapters...");
@@ -1060,9 +1062,6 @@
       });
 
     if($scope.qState && $scope.qState == 'a'){
-    		// 	var reqPromise = $.ajax("/api/bible/Exodus?verses=" + question.verse).done(function(bibleData) {
-    		// 		question.bibleData = bibleData;
-    		// 	});
 
      var versePromise = PbeService.getBibleData("Exodus", $scope.practiceQuestions[$scope.qNum-1].verse).$promise;
      versePromise
@@ -1089,8 +1088,13 @@
       if($scope.qState == 'q'){
         nextQState = 'a';
       } else if($scope.qState == 'a'){
+        
+        // record the score for the question
+        $scope.recordScore($scope.qNum-1, $scope.score);
+        
         nextQState='q';
         nextQNum++;
+        
       }
       
       if(nextQNum > $scope.practiceQuestions.length){
@@ -1101,6 +1105,53 @@
         "qnum": nextQNum,
         "qstate": nextQState
       })
+    }
+    
+    $scope.recordScore = function(qN, scoredPoints){
+      
+      var scoreQuestion = $scope.practiceQuestions[qN];
+      
+      var prRec = {};
+      
+      //prRec.userId = xxx;  // for now until we track users
+      //prRec.teamId = xxx;  // for now until we track teams
+      
+      prRec.points = scoredPoints;
+      prRec.possible = scoreQuestion.points;
+      prRec.percent  = Math.round(scoredPoints/scoreQuestion.points * 100.0);
+      prRec.passed   = prRec.points == prRec.possible?true:false;
+
+      prRec.primaryLocation = scoreQuestion.src;
+      if(scoreQuestion.src.lastIndexOf('SDA') === 0){
+        prRec.secondaryLocation = scoreQuestion.page;
+      } else {
+        // assume that this is a bible verse
+        var chapVerse = scoreQuestion.verse.split(":");
+        prRec.secondaryLocation = chapVerse[0];
+        prRec.tertiaryLocation = chapVerse[1];
+      }
+
+      // if the user didn't select a score, just skip recording it...
+      if(prRec.points == '---'){
+        return;
+      }
+
+      PbeService.postPractice(scoreQuestion, prRec);
+    }
+    
+    $scope.rotateScore = function(){
+      
+      if($scope.score == '---'){
+        $scope.score = $scope.practiceQuestions[$scope.qNum-1].points;
+      } else {
+        
+        $scope.score -= 1;
+        
+        if($scope.score < 0){
+          $scope.score = '---';
+        }
+      }
+
     }
 
     $scope.prev = function($event) {
