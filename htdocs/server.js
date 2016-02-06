@@ -652,10 +652,12 @@ function handleAddPracticeRecord(req, rsp){
   
   var newRecord = req.body;
 
+  // this code is needed to attempt to hack around bug in AWS stack that interacts badly with load balancing 
   var dynamoDb = new aws.DynamoDB({httpOptions: {
             agent: new https.Agent({
                 secureProtocol: "TLSv1_method",
-                ciphers: "ALL"
+                ciphers: "ALL",
+                maxCachedSessions: 0
             })
         }} )
   var docClient = new aws.DynamoDB.DocumentClient({service: dynamoDb});
