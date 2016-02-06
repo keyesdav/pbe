@@ -12,6 +12,7 @@ var request  = require('request');
 var uuid     = require('uuid');
 var bodyParser = require('body-parser');
 var NodeCache = require( "node-cache" );
+var https     = require("https");
 
 var scoreCache = new NodeCache( { stdTTL: (0), checkperiod: 0});  // seconds
 
@@ -651,7 +652,13 @@ function handleAddPracticeRecord(req, rsp){
   
   var newRecord = req.body;
 
-  var docClient = new aws.DynamoDB.DocumentClient();
+  var dynamoDb = new aws.DynamoDB({httpOptions: {
+            agent: new https.Agent({
+                secureProtocol: "TLSv1_method",
+                ciphers: "ALL"
+            })
+        }} )
+  var docClient = new aws.DynamoDB.DocumentClient({service: dynamoDb});
   
   // first, try to get the testId from the URL
   var qId = req.params.questionId;
